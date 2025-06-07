@@ -1,0 +1,64 @@
+/* frontend/src/index.css */
+
+/* Reset y tipografía base */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff; /* fondo blanco */
+  color: #213547; /* texto oscuro */
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+
+/* Enlaces */
+a {
+  font-weight: 500;
+  color: #0070f3;
+  text-decoration: none;
+}
+a:hover {
+  color: #0051a3;
+}
+
+/* Encabezados */
+h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Botones */
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+button:hover {
+  background-color: #e0e0e0;
+  border-color: #0070f3;
+}
+button:focus,
+button:focus-visible {
+  outline: 3px solid #0070f3;
+}
+
+/* Ajustes responsive básicos */
+@media (max-width: 600px) {
+  html,
+  body,
+  #root {
+    padding: 0.5rem;
+  }
+}

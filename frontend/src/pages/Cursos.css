@@ -1,0 +1,49 @@
+/* Cursos.css */
+
+.courses-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.courses-container h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: #213547;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.course-card {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.course-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #0070f3;
+}
+
+.card-header {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0070f3;
+  text-align: center;
+}
+
+.status-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.status-msg.error {
+  color: #c00;
+}
