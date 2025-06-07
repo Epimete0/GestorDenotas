@@ -1,177 +1,154 @@
-# GestorDenotas: Plataforma de Gestión Escolar
+GestorDenotas: Plataforma de Gestión Escolar
+GestorDenotas es una solución de código abierto diseñada para facilitar la administración integral de establecimientos educativos: estudiantes, cursos, asignaturas, calificaciones, asistencia y reportes.
 
-**GestorDenotas** es una solución de código abierto diseñada para facilitar la administración integral de establecimientos educativos: estudiantes, cursos, calificaciones, asistencia y reportes.
-
----
-
-## 📁 Estructura del proyecto
-
-```plaintext
+📁 Estructura del proyecto
+graphql
+Copiar
+Editar
 GestorDenotas/
-├── Arquidiseño.md              # Documentación de arquitectura y diseño UML
-├── .gitignore                  # Configuración de archivos ignorados por Git
-├── backend/                    # API y lógica de negocio (Node.js + Express + TypeScript)
-│   ├── prisma/                 # ORM Prisma: esquema, migraciones y seeds
-│   │   ├── migrations/         # Archivos de migración (Prisma Migrate)
-│   │   ├── dev.db              # Base de datos SQLite para desarrollo
-│   │   ├── schema.prisma       # Modelos y relaciones del dominio
-│   │   └── seed.ts             # Script para poblar datos de prueba
-│   ├── src/                    # Fuente del servidor
-│   │   ├── config/             # Variables de entorno y cliente Prisma (Singleton)
-│   │   │   ├── env.ts          # Validación y carga de .env
-│   │   │   └── prisma.ts       # Exportación de instancia Prisma Client
-│   │   ├── controllers/        # Rutas y controladores HTTP
-│   │   ├── models/             # Interfaces y tipos de dominio
-│   │   ├── repositories/       # Acceso a datos (Repository Pattern)
-│   │   ├── services/           # Lógica de negocio (Service Layer)
-│   │   └── app.ts              # Configuración de Express y middlewares
-│   ├── .env                    # Variables sensibles (no versionar)
-│   ├── .gitignore              # Ignorar node_modules, logs, .env
-│   ├── package.json            # Dependencias y scripts del backend
-│   └── tsconfig.json           # Configuración de TypeScript backend
+├── Arquidiseño.md            # Documentación de diseño de arquitectura
+├── .gitignore                # Archivos ignorados por Git
+├── backend/                  # API y lógica de negocio (Node.js + Express)
+│   ├── prisma/               # Esquema, migraciones y seed de la BD
+│   │   ├── schema.prisma
+│   │   ├── migrations/
+│   │   └── seed.ts
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── prisma.ts     # Singleton de Prisma Client
+│   │   ├── controllers/      # Rutas Express (courses, grades, estudiantes, summary…)
+│   │   ├── repositories/     # CRUD con Prisma
+│   │   ├── services/         # Lógica de negocio
+│   │   └── app.ts            # Configuración del servidor y montaje de rutas
+│   └── package.json          # Dependencias y scripts del backend
+├── frontend/                 # Cliente web (React + Vite + TypeScript)
+│   ├── public/               # Archivos estáticos
+│   ├── src/
+│   │   ├── assets/           # Imágenes, SVGs
+│   │   ├── components/       # Layout, Nav, Cards…
+│   │   ├── pages/            # Vistas: Dashboard, Cursos, Inscripción…
+│   │   ├── services/         # Cliente HTTP (api.ts)
+│   │   ├── App.tsx           # Rutas y componente raíz
+│   │   ├── index.css         # Reset y estilos base
+│   │   └── main.tsx          # Montaje del `<App/>`
+│   └── package.json          # Dependencias y scripts del frontend
+└── docker-compose.yml        # (Opcional) Despliegue con Docker
+🏛️ Arquitectura
+Capas (N-Tier)
+Presentación
 
-├── database/                   # Scripts SQL para otros motores (opcionales)
-│   ├── schema.sql              # Definición de tablas y relaciones
-│   └── seeds.sql               # Población de datos de prueba
+React + Vite (UI minimalista, React Router).
 
-├── frontend/                   # Cliente web (React + Vite + TypeScript)
-│   ├── public/                 # HTML y recursos estáticos
-│   │   └── index.html          # Plantilla base
-│   ├── src/                    # Código de la aplicación
-│   │   ├── assets/             # Imágenes, SVGs y fuentes
-│   │   ├── components/         # Componentes UI reutilizables
-│   │   ├── pages/              # Vistas principales (Dashboard, Estudiantes,...)
-│   │   ├── services/           # Cliente HTTP (axios/fetch) para la API
-│   │   ├── App.tsx             # Componente raíz con rutas
-│   │   └── main.tsx            # Bootstrap de React y Vite
-│   ├── .gitignore              # Ignorar node_modules y artefactos de build
-│   ├── package.json            # Dependencias y scripts del frontend
-│   ├── tsconfig.json           # Configuración de TypeScript frontend
-│   └── vite.config.ts          # Configuración de bundling y alias
+API / Servicio
 
-├── deploy/                     # Docker y despliegue
-│   ├── docker-compose.yml      # Definición de servicios (frontend, backend, DB)
-│   ├── Dockerfile.backend      # Imagen Docker para API
-│   └── Dockerfile.frontend     # Imagen Docker para cliente
+Node.js + Express + TypeScript. Rutas REST en controllers/.
 
-├── tests/                      # Pruebas automatizadas
-│   ├── backend/                # Jest + Supertest (servicios y controladores)
-│   └── frontend/               # React Testing Library (componentes)
+Negocio
 
-└── docs/                       # Documentación adicional
-    ├── requisitos.md          # Requisitos funcionales y no funcionales
-    ├── arquitectura_4plus1.md  # Modelo 4+1: Lógica, Desarrollo, Procesos, Física, Escenarios
-    └── diseño_uml/             # Diagramas PlantUML (casos de uso, clases, secuencia)
-```
+Servicios en services/ que orquestan repositorios.
 
----
+Persistencia
 
-## 🏛️ Arquitectura
+Repositorios en repositories/ usan Prisma Client.
 
-### Capas (N-Tier)
+Modelo 4+1 Vistas
+Lógica: Diagramas UML de entidades (Estudiante, Curso, Asignatura, Calificación, Asistencia, Observación).
 
-1. **Presentación**: Cliente React (`frontend/`)
-2. **Servicio**: API Express (`backend/src/controllers` → expone rutas REST)
-3. **Negocio**: Lógica central en `backend/src/services`
-4. **Persistencia**: Repositorios (`backend/src/repositories`) y Prisma Client
+Desarrollo: Estructura de módulos y carpetas (descrita arriba).
 
-### Modelo 4+1 Vistas (PlantUML en `docs/arquitectura_4plus1.md`)
+Procesos: Flujo de peticiones HTTP, middlewares (CORS, JSON, manejo de errores).
 
-* **Vista Lógica**: Diagrama de clases UML de entidades: `Estudiante`, `Curso`, `Calificación`, `Asistencia`.
-* **Vista de Desarrollo**: Estructura de carpetas y módulos (como se describe en este README).
-* **Vista de Procesos**: Flujo de peticiones HTTP, middlewares (autenticación, logging), y manejo de concurrencia.
-* **Vista Física**: Diseño de despliegue con Docker Compose: contenedores separados para frontend, backend y DB.
-* **Vista de Escenarios**: Diagramas de secuencia para casos de uso clave: inscripción de estudiante, generación de reporte.
+Física: Diseño de despliegue con Docker Compose.
 
----
+Escenarios: Secuencias de uso (inscripción, registrar nota, reportes).
 
-## 🛠️ Patrones de Diseño
+🛠️ Patrones de Diseño
+Repository: CRUD encapsulado en repositories/.
 
-* **Repository**: Encapsula operaciones CRUD en carpetas `repositories/`.
-* **Service**: Capa intermedia en `services/` que orquesta reglas de negocio.
-* **Singleton**: Prisma Client instanciado una vez en `config/prisma.ts`.
-* **Factory Method**: Generación de reportes (`ReportePDF`, `ReporteExcel`) que implementan una interfaz común.
-* **Strategy**: Algoritmos de cálculo de estadísticas (promedio, mediana) intercambiables.
-* **Observer**: Notificaciones ante eventos importantes (nuevo registro, ausencia crítica).
+Service: Lógica de negocio en services/.
 
----
+Singleton: Prisma Client en config/prisma.ts.
 
-## 🚀 Tecnologías Principales
+Factory Method: (Futuro) generación de reportes PDF/Excel.
 
-| Capa     | Herramientas                                 |
-| -------- | -------------------------------------------- |
-| Frontend | React, Vite, TypeScript, Axios, React Router |
-| Backend  | Node.js, Express, TypeScript, Prisma, Zod    |
-| DB       | SQLite (dev) / PostgreSQL (prod)             |
-| Testing  | Jest, Supertest, React Testing Library       |
-| DevOps   | Docker, Docker Compose, GitHub Actions (CI)  |
+Strategy: Cálculo de métricas intercambiables.
 
----
+Observer: (Futuro) notificaciones ante eventos.
 
-## ⚙️ Guía de Inicio Rápido
+🚀 Tecnologías Principales
+Capa	Herramientas
+Frontend	React, Vite, TypeScript, React Router
+Backend	Node.js, Express, TypeScript, Prisma
+DB	SQLite (desarrollo) / PostgreSQL (prod)
+Testing	Jest, Supertest, React Testing Library
+DevOps	Docker, Docker Compose, GitHub Actions
 
-1. **Clonar**:
+⚙️ Guía de Inicio Rápido
+Clonar el repositorio
 
-   ```bash
-   git clone https://github.com/Epimete0/GestorDenotas.git
-   cd GestorDenotas
-   ```
-2. **Backend**:
+bash
+Copiar
+Editar
+git clone https://github.com/Epimete0/GestorDenotas.git
+cd GestorDenotas
+Backend
 
-   ```bash
-   cd backend
-   npm install
-   cp .env.example .env
-   npx prisma migrate dev
-   npx prisma db seed
-   npm run dev  # http://localhost:4000
-   ```
-3. **Frontend**:
+bash
+Copiar
+Editar
+cd backend
+npm install
+cp .env.example .env
+npx prisma migrate dev --name init_esquema
+npx prisma db seed
+npm run dev   # Servidor en http://localhost:4000
+Frontend
 
-   ```bash
-   cd ../frontend
-   npm install
-   npm run dev  # http://localhost:3000
-   ```
-4. **Tests**:
+bash
+Copiar
+Editar
+cd ../frontend
+npm install
+npm run dev   # Cliente en http://localhost:5173
+Pruebas
 
-   ```bash
-   # Backend
-   cd backend && npm test
-   # Frontend
-   cd ../frontend && npm test
-   ```
-5. **Despliegue Docker**:
+bash
+Copiar
+Editar
+# Backend
+cd backend && npm test
 
-   ```bash
-   docker-compose up --build
-   ```
+# Frontend
+cd ../frontend && npm test
+Despliegue con Docker (opcional)
 
----
+bash
+Copiar
+Editar
+docker-compose up --build
+🔄 Flujo de Trabajo Git
+Crear rama nueva
 
-## 🔄 Flujo de Trabajo Git
+bash
+Copiar
+Editar
+git checkout -b feature/mi-feature
+Commits atómicos
 
-1. Nueva rama: `git checkout -b feature/mi-feature`
-2. Commit: `git add . && git commit -m "feat: descripción concisa"`
-3. Push & PR: `git push -u origin feature/mi-feature`
+bash
+Copiar
+Editar
+git add . && git commit -m "feat: descripción breve"
+Push & Pull Request a main/master
 
----
+📄 Licencia
+Este proyecto está bajo la licencia MIT. Consulta LICENSE.md para más detalles.
 
-## 🤝 Contribuciones
+Creado con ♥ por Epimete0
 
-¡Tus aportes son bienvenidos! Sigue estas pautas:
 
-1. Abre un *Issue* describiendo tu propuesta.
-2. Crea un *branch* específico.
-3. Realiza commits atómicos y claros.
-4. Abre *Pull Request* apuntando a la rama `master` (o `main`).
 
----
 
-## 📄 Licencia
 
-Este proyecto está licenciado bajo MIT. Consulta el archivo `LICENSE.md` para detalles.
 
----
 
-> *Creado con ♥ por Epimete0*.
