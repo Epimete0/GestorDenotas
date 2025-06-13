@@ -81,11 +81,9 @@ GestorDenotas/
 
 | Capa     | Herramientas                                 |
 | -------- | -------------------------------------------- |
-| Frontend | React, Vite, TypeScript, Axios, React Router |
-| Backend  | Node.js, Express, TypeScript, Prisma, Zod    |
-| DB       | SQLite (dev) / PostgreSQL (prod)             |
-| Testing  | Jest, Supertest, React Testing Library       |
-| DevOps   | Docker, Docker Compose, GitHub Actions (CI)  |
+| Frontend | React, Vite, TypeScript, React Router        |
+| Backend  | Node.js, Express, TypeScript, Prisma         |
+| DB       | SQLite (dev)                                 |
 
 ---
 
@@ -114,19 +112,6 @@ GestorDenotas/
    npm install
    npm run dev  # http://localhost:3000
    ```
-4. **Tests**:
-
-   ```bash
-   # Backend
-   cd backend && npm test
-   # Frontend
-   cd ../frontend && npm test
-   ```
-5. **Despliegue Docker**:
-
-   ```bash
-   docker-compose up --build
-   ```
 
 ---
 
@@ -137,22 +122,6 @@ GestorDenotas/
 3. Push & PR: `git push -u origin feature/mi-feature`
 
 ---
-
-## 🤝 Contribuciones
-
-¡Tus aportes son bienvenidos! Sigue estas pautas:
-
-1. Abre un *Issue* describiendo tu propuesta.
-2. Crea un *branch* específico.
-3. Realiza commits atómicos y claros.
-4. Abre *Pull Request* apuntando a la rama `master` (o `main`).
-
 ---
 
-## 📄 Licencia
-
-Este proyecto está licenciado bajo MIT. Consulta el archivo `LICENSE.md` para detalles.
-
----
-
-> *Creado con ♥ por Epimete0*.
+> *Creado por Epimete0*.
