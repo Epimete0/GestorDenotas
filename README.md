@@ -56,14 +56,6 @@ GestorDenotas/
 3. **Negocio**: Lógica central en `backend/src/services`
 4. **Persistencia**: Repositorios (`backend/src/repositories`) y Prisma Client
 
-### Modelo 4+1 Vistas (PlantUML en `docs/arquitectura_4plus1.md`)
-
-* **Vista Lógica**: Diagrama de clases UML de entidades: `Estudiante`, `Curso`, `Calificación`, `Asistencia`.
-* **Vista de Desarrollo**: Estructura de carpetas y módulos (como se describe en este README).
-* **Vista de Procesos**: Flujo de peticiones HTTP, middlewares (autenticación, logging), y manejo de concurrencia.
-* **Vista Física**: Diseño de despliegue con Docker Compose: contenedores separados para frontend, backend y DB.
-* **Vista de Escenarios**: Diagramas de secuencia para casos de uso clave: inscripción de estudiante, generación de reporte.
-
 ---
 
 ## 🛠️ Patrones de Diseño
