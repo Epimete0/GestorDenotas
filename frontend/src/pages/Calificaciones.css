@@ -1,0 +1,142 @@
+/* Calificaciones.css */
+
+/* Contenedor general */
+.calificaciones-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+/* Grid de los dos paneles */
+.calificaciones-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* Estilo de tarjetas */
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Header del panel de notas */
+.panel-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.panel-header label {
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.panel-header select {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Lista de calificaciones */
+.grades-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.grade-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.grade-item:last-child {
+  border-bottom: none;
+}
+
+.subject-name {
+  font-weight: 600;
+  color: #444;
+}
+
+.subject-value {
+  text-align: right;
+  font-weight: 500;
+  color: #0070f3;
+}
+
+.subject-date {
+  margin-left: 1rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* Formulario de agregar */
+.form-panel .panel-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.add-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.add-form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.add-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  background-color: #0070f3;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #005bb5;
+}
+
+/* Feedback messages */
+.feedback {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.feedback.error {
+  color: #d32f2f;
+}
+
+.feedback.success {
+  color: #388e3c;
+}

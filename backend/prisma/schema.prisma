@@ -1,0 +1,148 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// =======================
+//      Modelos
+// =======================
+
+model Usuario {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  password     String
+  rol          Rol       @default(profesor)
+  profesorId   Int?      @unique // Nullable para admin, único para profesor
+  activo       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profesor     Profesor? @relation(fields: [profesorId], references: [id])
+}
+
+model Estudiante {
+  id             Int             @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  edad           Int
+  sexo           String          // 'M' o 'F'
+  cursoId        Int
+  curso          Curso           @relation(fields: [cursoId], references: [id])
+  calificaciones Calificacion[]
+  observaciones  Observacion[]
+  asistencias    Asistencia[]
+}
+
+model Profesor {
+  id             Int                @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  edad           Int
+  sexo           String             // 'M' o 'F'
+  jefeDeCurso    Curso[]            @relation("JefeDeCurso")
+  asignaturas    ProfesorAsignatura[]
+  calificaciones Calificacion[]
+  observaciones  Observacion[]
+  usuario        Usuario?
+}
+
+model Curso {
+  id             Int                     @id @default(autoincrement())
+  nombre         String                  // e.g. "1° Básico A"
+  jefeId         Int
+  jefeDeCurso    Profesor                @relation("JefeDeCurso", fields: [jefeId], references: [id])
+  estudiantes    Estudiante[]
+  planDeEstudio  CursoAsignatura[]
+}
+
+model Asignatura {
+  id             Int                     @id @default(autoincrement())
+  nombre         String                  // e.g. "Matemáticas"
+  profesores     ProfesorAsignatura[]
+  cursos         CursoAsignatura[]
+  calificaciones Calificacion[]
+}
+
+model Calificacion {
+  id             Int         @id @default(autoincrement())
+  estudianteId   Int
+  asignaturaId   Int
+  profesorId     Int
+  valor          Float
+  fecha          DateTime    @default(now())
+
+  estudiante     Estudiante  @relation(fields: [estudianteId], references: [id])
+  asignatura     Asignatura  @relation(fields: [asignaturaId], references: [id])
+  profesor       Profesor    @relation(fields: [profesorId], references: [id])
+}
+
+model Observacion {
+  id             Int         @id @default(autoincrement())
+  estudianteId   Int
+  profesorId     Int
+  texto          String
+  estado         EstadoObs   @default(neutro)
+
+  estudiante     Estudiante  @relation(fields: [estudianteId], references: [id])
+  profesor       Profesor    @relation(fields: [profesorId], references: [id])
+}
+
+model Asistencia {
+  id             Int         @id @default(autoincrement())
+  estudianteId   Int
+  fecha          DateTime
+  estado         EstadoAsis  @default(presente)
+
+  estudiante     Estudiante  @relation(fields: [estudianteId], references: [id])
+}
+
+// =======================
+//   Tablas intermedias
+// =======================
+
+model ProfesorAsignatura {
+  profesorId     Int
+  asignaturaId   Int
+
+  profesor       Profesor    @relation(fields: [profesorId], references: [id])
+  asignatura     Asignatura  @relation(fields: [asignaturaId], references: [id])
+
+  @@id([profesorId, asignaturaId])
+}
+
+model CursoAsignatura {
+  cursoId        Int
+  asignaturaId   Int
+
+  curso          Curso       @relation(fields: [cursoId], references: [id])
+  asignatura     Asignatura  @relation(fields: [asignaturaId], references: [id])
+
+  @@id([cursoId, asignaturaId])
+}
+
+// =======================
+//      Enumeraciones
+// =======================
+
+enum Rol {
+  admin
+  profesor
+}
+
+enum EstadoObs {
+  negativa
+  neutro
+  positiva
+}
+
+enum EstadoAsis {
+  presente
+  ausente
+  tarde
+}
