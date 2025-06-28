@@ -4,6 +4,51 @@
 
 ---
 
+## 📋 **Requisitos Previos**
+
+Antes de comenzar, asegúrate de tener instalado:
+
+### **Software Necesario:**
+- **Node.js** (versión 18 o superior) - [Descargar aquí](https://nodejs.org/)
+- **npm** (viene con Node.js) o **yarn** (opcional)
+- **Git** - [Descargar aquí](https://git-scm.com/)
+- **Editor de código** (VS Code recomendado) - [Descargar aquí](https://code.visualstudio.com/)
+
+### **Verificar instalaciones:**
+```bash
+node --version    # Debe ser 18.x o superior
+npm --version     # Debe ser 9.x o superior
+git --version     # Cualquier versión reciente
+```
+
+---
+
+## 🏗️ **Tecnologías y Frameworks Utilizados**
+
+### **Frontend:**
+- **React 18** - Biblioteca para interfaces de usuario
+- **TypeScript 5.x** - Tipado estático para JavaScript
+- **Vite** - Bundler y servidor de desarrollo ultrarrápido
+- **React Router** - Navegación SPA
+- **jsPDF + jspdf-autotable** - Generación de PDFs
+- **xlsx** - Exportación a Excel
+- **Vitest** - Framework de testing
+
+### **Backend:**
+- **Node.js** - Runtime de JavaScript
+- **Express** - Framework web para APIs
+- **TypeScript** - Tipado estático
+- **Prisma ORM** - ORM para base de datos
+- **SQLite** - Base de datos (desarrollo)
+- **CORS** - Middleware para peticiones cross-origin
+- **dotenv** - Variables de entorno
+
+### **Base de Datos:**
+- **SQLite** - Base de datos ligera (incluida en el proyecto)
+- **Prisma Migrations** - Control de versiones de la base de datos
+
+---
+
 ## 📦 Estructura del Proyecto
 
 ```
@@ -17,6 +62,59 @@ GestorDenotas-master/
 │   └── ...         # Configuración y dependencias
 └── README.md        # Esta guía
 ```
+
+---
+
+## 🚀 **Instalación y Ejecución Paso a Paso**
+
+### **Paso 1: Clonar el repositorio**
+```bash
+# Abre una terminal y ejecuta:
+git clone https://github.com/Epimete0/GestorDenotas.git
+cd GestorDenotas-master
+```
+
+### **Paso 2: Configurar el Backend**
+```bash
+# Navegar al directorio backend
+cd backend
+
+# Instalar dependencias
+npm install
+
+# Generar el cliente de Prisma
+npx prisma generate
+
+# Ejecutar migraciones de la base de datos
+npx prisma migrate dev
+
+# Poblar la base de datos con datos de ejemplo
+npx prisma db seed
+
+# Iniciar el servidor de desarrollo
+npm run dev
+```
+
+**✅ El backend estará corriendo en:** `http://localhost:4000`
+
+### **Paso 3: Configurar el Frontend**
+```bash
+# Abrir una nueva terminal y navegar al directorio frontend
+cd frontend
+
+# Instalar dependencias
+npm install
+
+# Iniciar el servidor de desarrollo
+npm run dev
+```
+
+**✅ El frontend estará corriendo en:** `http://localhost:3000`
+
+### **Paso 4: Acceder a la aplicación**
+1. Abre tu navegador
+2. Ve a `http://localhost:3000`
+3. Usa las credenciales demo (ver sección de credenciales)
 
 ---
 
@@ -125,18 +223,73 @@ GestorDenotas-master/
 ---
 
 ## 🛠️ Troubleshooting y Buenas Prácticas
-- Si tienes errores de Prisma, ejecuta:
-  - `npx prisma generate`
-  - `npx prisma migrate dev`
-- Si el frontend no compila, revisa las importaciones y ejecuta `npm run build` para ver detalles.
-- Si algún endpoint falla, revisa la consola del backend para mensajes de error.
-- El código sigue buenas prácticas de TypeScript, Express y React.
+
+### **Errores Comunes y Soluciones:**
+
+#### **Error: "command not found: node"**
+- **Solución:** Instala Node.js desde [nodejs.org](https://nodejs.org/)
+
+#### **Error: "prisma command not found"**
+- **Solución:** Ejecuta `npm install` en el directorio backend
+
+#### **Error: "database locked"**
+- **Solución:** Cierra otros procesos que usen la base de datos o reinicia el servidor
+
+#### **Error: "port already in use"**
+- **Solución:** Cambia el puerto en el archivo de configuración o cierra otros servicios
+
+#### **Error: "module not found"**
+- **Solución:** Ejecuta `npm install` en el directorio correspondiente
+
+#### **Error de compilación TypeScript**
+- **Solución:** Verifica que tienes TypeScript instalado: `npm install -g typescript`
+
+### **Comandos Útiles:**
+```bash
+# Verificar versiones
+node --version
+npm --version
+
+# Limpiar cache de npm
+npm cache clean --force
+
+# Reinstalar dependencias
+rm -rf node_modules package-lock.json
+npm install
+
+# Regenerar Prisma
+npx prisma generate
+npx prisma migrate reset
+
+# Ejecutar tests
+npx vitest run
+
+# Compilar para producción
+npm run build
+```
+
+### **Buenas Prácticas:**
+- Siempre ejecuta `npm install` después de clonar el proyecto
+- Mantén Node.js actualizado
+- Usa un editor con soporte para TypeScript (VS Code recomendado)
+- Revisa la consola del navegador y del servidor para errores
+- El código sigue buenas prácticas de TypeScript, Express y React
 
 ---
 
 ## 📄 Documentación y Arquitectura
 - Consulta `Arquidiseño.md` para detalles de arquitectura y decisiones de diseño.
 - El código está documentado y sigue buenas prácticas de TypeScript y Express.
+
+---
+
+## 🤝 **Contribuir al Proyecto**
+
+1. **Fork** el repositorio
+2. **Crea una rama** para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. **Commit** tus cambios (`git commit -m 'feat: agregar nueva funcionalidad'`)
+4. **Push** a la rama (`git push origin feature/nueva-funcionalidad`)
+5. **Abre un Pull Request**
 
 ---
 
