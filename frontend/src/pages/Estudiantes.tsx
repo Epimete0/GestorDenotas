@@ -994,7 +994,7 @@ export default function Estudiantes() {
   return (
     <div className="estudiantes-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2>Administración de Estudiantes</h2>
+      <h2>Administración de Estudiantes</h2>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <button
             onClick={() => setMostrarObsModal(true)}
@@ -1062,12 +1062,12 @@ export default function Estudiantes() {
                 <strong>Observaciones:</strong> {e.observaciones.length}
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                <button
-                  className="ver-ficha-btn"
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    setFichaId(e.id);
-                  }}
+              <button
+                className="ver-ficha-btn"
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  setFichaId(e.id);
+                }}
                   style={{ flex: 1, background: 'var(--accent-secondary)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 500, fontSize: '1rem' }}
                 >
                   Ver Ficha
@@ -1115,7 +1115,7 @@ export default function Estudiantes() {
                   title="Eliminar estudiante"
                 >
                   {IconDelete}
-                </button>
+              </button>
               </div>
             </div>
           </div>

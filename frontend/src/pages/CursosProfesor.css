@@ -1,0 +1,291 @@
+/* CursosProfesor.css: estilos exclusivos para la página de cursos del profesor */
+
+.cprof-bg {
+  min-height: 100vh;
+  background: #111418;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', 'Noto Sans', sans-serif;
+}
+
+.cprof-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.cprof-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #293038;
+  padding: 0.75rem 2.5rem;
+  background: #111418;
+}
+
+.cprof-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #fff;
+}
+
+.cprof-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cprof-title {
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: bold;
+  letter-spacing: -0.015em;
+}
+
+.cprof-header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.cprof-menu {
+  display: flex;
+  gap: 2.25rem;
+}
+
+.cprof-menu a {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.cprof-menu a:hover {
+  color: #1978e5;
+}
+
+.cprof-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-left: 1.5rem;
+}
+
+.cprof-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem 0;
+}
+
+.cprof-content-inner {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cprof-title-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+
+.cprof-title-col {
+  min-width: 18rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cprof-dashboard-title {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+}
+
+.cprof-dashboard-desc {
+  color: #9daab8;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.cprof-table-wrap {
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.cprof-table-outer {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid #3c4753;
+  background: #111418;
+}
+
+.cprof-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cprof-table-head-row {
+  background: #1c2126;
+}
+
+.cprof-table-col-120,
+.cprof-table-col-240,
+.cprof-table-col-360 {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.cprof-table-col-240,
+.cprof-table-col-360 {
+  color: #9daab8;
+}
+
+.cprof-table-row {
+  border-top: 1px solid #3c4753;
+}
+
+.cprof-table-row td {
+  height: 72px;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.cprof-table-col-120 {
+  width: 400px;
+}
+.cprof-table-col-240 {
+  width: 400px;
+}
+.cprof-table-col-360 {
+  width: 240px;
+  font-weight: bold;
+  letter-spacing: 0.015em;
+}
+
+.cprof-estudiantes-btn {
+  background: #1978e5;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin: 0;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(25,120,229,0.08);
+}
+.cprof-estudiantes-btn:hover, .cprof-estudiantes-btn:focus {
+  background: #125bb5;
+  color: #fff;
+}
+
+.cprof-feedback {
+  text-align: center;
+  font-size: 1rem;
+  color: #9daab8;
+  margin: 1.5rem 0;
+}
+.cprof-error {
+  color: #ff5252;
+  font-weight: bold;
+}
+
+.cprof-modal-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s;
+}
+.cprof-modal {
+  background: #181b1f;
+  border-radius: 1rem;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 320px;
+  max-width: 95vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  animation: popIn 0.2s;
+}
+.cprof-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.cprof-modal-close:hover {
+  color: #ff5252;
+}
+.cprof-modal-title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.cprof-modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.cprof-modal-list-item {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #23272b;
+  color: #fff;
+  font-size: 1rem;
+  text-align: left;
+}
+.cprof-modal-list-item:last-child {
+  border-bottom: none;
+}
+@media (max-width: 600px) {
+  .cprof-modal {
+    min-width: 0;
+    width: 98vw;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+  }
+  .cprof-modal-title {
+    font-size: 1rem;
+  }
+  .cprof-modal-list-item {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.25rem;
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+} 

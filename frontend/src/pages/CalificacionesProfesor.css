@@ -1,0 +1,552 @@
+/* CalificacionesProfesor.css: estilos para la página de gestión de calificaciones del profesor */
+
+.calificaciones-container {
+  min-height: 100vh;
+  background: none;
+  font-family: 'Inter', 'Noto Sans', sans-serif;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.calificaciones-header {
+  padding: 2.5rem 1.5rem 1rem 1.5rem;
+}
+
+.calificaciones-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 100%;
+}
+
+.calificaciones-title {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.calificaciones-subtitle {
+  color: #adadad;
+  font-size: 0.875rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.calificaciones-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 1.25rem;
+  justify-content: stretch;
+  align-items: stretch;
+  padding: 0 0.5rem 1.5rem 0.5rem;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.calificaciones-form-container {
+  flex: 1 1 0;
+  min-width: 160px;
+  max-width: none;
+  background: #181b1f;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 1rem 0.5rem;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.calificaciones-list-container {
+  flex: 2 1 0;
+  min-width: 220px;
+  max-width: none;
+  background: #181b1f;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 1rem 0.5rem;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.calificaciones-form {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.calificaciones-list {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label-text {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.form-select,
+.form-input {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  resize: none;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: #262626;
+  border: 1px solid #4d4d4d;
+  height: 3.5rem;
+  padding: 0.9375rem;
+  font-size: 1rem;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-select:focus,
+.form-input:focus {
+  outline: none;
+  border-color: #4d4d4d;
+  box-shadow: none;
+}
+
+.form-select::placeholder,
+.form-input::placeholder {
+  color: #adadad;
+}
+
+.form-select {
+  background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(173,173,173)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e');
+  background-repeat: no-repeat;
+  background-position: right 0.9375rem center;
+  background-size: 1.5rem;
+  padding-right: 3rem;
+}
+
+.message {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.message.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.message.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.btn {
+  display: flex;
+  min-width: 5.25rem;
+  max-width: 30rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  height: 2.5rem;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  line-height: normal;
+  letter-spacing: 0.015em;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #000;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #333;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-secondary {
+  background: #363636;
+  color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #525252;
+}
+
+.list-title {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.loading-text,
+.empty-text {
+  color: #adadad;
+  text-align: center;
+  font-size: 1rem;
+  margin: 2rem 0;
+}
+
+.grades-table {
+  background: none;
+  border: 1px solid #4d4d4d;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.grades-table table {
+  width: 100%;
+  min-width: 350px;
+  border-collapse: collapse;
+}
+
+.grades-table th {
+  background: none;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid #4d4d4d;
+}
+
+.grades-table td {
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 1rem;
+  border-bottom: 1px solid #4d4d4d;
+}
+
+.grades-table tr:last-child td {
+  border-bottom: none;
+}
+
+.grades-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.grade-value {
+  font-weight: 600;
+  text-align: center;
+}
+
+.grade-value.passing {
+  color: #4caf50;
+}
+
+.grade-value.failing {
+  color: #f44336;
+}
+
+.btn-edit {
+  background: #1978e5;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-edit:hover {
+  background: #125bb5;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .calificaciones-header,
+  .calificaciones-content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .calificaciones-content {
+    gap: 0.75rem;
+  }
+  .calificaciones-form-container {
+    min-width: 120px;
+    padding: 0.5rem 0.25rem;
+  }
+  .calificaciones-list-container {
+    min-width: 180px;
+    padding: 0.5rem 0.25rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .calificaciones-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+  }
+  
+  .calificaciones-form-container, .calificaciones-list-container {
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+  }
+  
+  .form-actions {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn {
+    min-width: 7.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .grades-table table {
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calificaciones-header {
+    padding: 1.5rem 1rem 1rem 1rem;
+  }
+  
+  .calificaciones-content {
+    padding: 0 1rem 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+  
+  .calificaciones-title {
+    font-size: 1.5rem;
+  }
+  
+  .calificaciones-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 3rem;
+    font-size: 0.9rem;
+  }
+  
+  .list-title {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+  
+  .grades-table th,
+  .grades-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-edit {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .calificaciones-header {
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+  }
+  
+  .calificaciones-content {
+    padding: 0 0.5rem 1rem 0.5rem;
+    gap: 1rem;
+  }
+  
+  .calificaciones-form-container, .calificaciones-list-container {
+    padding: 0.5rem;
+  }
+  
+  .calificaciones-title {
+    font-size: 1.2rem;
+  }
+  
+  .calificaciones-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .list-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-select,
+  .form-input {
+    height: 3rem;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+  
+  .label-text {
+    font-size: 0.9rem;
+  }
+  
+  .grades-table table {
+    min-width: 180px;
+  }
+  
+  .btn-edit {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.65rem;
+    border-radius: 0.25rem;
+  }
+  
+  .message {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calificaciones-container {
+    min-height: auto;
+  }
+  
+  .calificaciones-header {
+    padding: 0.75rem 0.25rem 0.5rem 0.25rem;
+  }
+  
+  .calificaciones-content {
+    padding: 0 0.25rem 0.75rem 0.25rem;
+  }
+  
+  .calificaciones-title {
+    font-size: 1.1rem;
+  }
+  
+  .calificaciones-subtitle {
+    font-size: 0.7rem;
+  }
+  
+  .form-group {
+    gap: 0.25rem;
+  }
+  
+  .form-select,
+  .form-input {
+    height: 2.75rem;
+    font-size: 0.85rem;
+    padding: 0.625rem;
+  }
+  
+  .btn {
+    height: 2.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .list-title {
+    font-size: 1rem;
+  }
+  
+  .grades-table th,
+  .grades-table td {
+    padding: 0.375rem 0.125rem;
+    font-size: 0.7rem;
+  }
+  
+  .btn-edit {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6rem;
+  }
+  
+  .loading-text,
+  .empty-text {
+    font-size: 0.85rem;
+    margin: 1.5rem 0;
+  }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 900px) and (orientation: landscape) {
+  .calificaciones-content {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .calificaciones-form-container {
+    flex: 1 1 15.625rem;
+  }
+  
+  .calificaciones-list-container {
+    flex: 1 1 25rem;
+  }
+  
+  .form-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  
+  .btn {
+    width: auto;
+    min-width: 6.25rem;
+  }
+} 

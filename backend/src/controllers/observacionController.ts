@@ -35,6 +35,17 @@ router.get("/estudiante/:estudianteId", async (req, res, next) => {
   }
 });
 
+// GET /api/observaciones/profesor/:profesorId - Buscar por profesor
+router.get("/profesor/:profesorId", async (req, res, next) => {
+  try {
+    const profesorId = Number(req.params.profesorId);
+    const observaciones = await observacionService.findByProfesor(profesorId);
+    res.json({ observaciones });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/observaciones - Crear
 router.post("/", async (req, res, next) => {
   try {

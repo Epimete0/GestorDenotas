@@ -49,6 +49,8 @@ export default function Layout() {
     }
   };
 
+  const [obsView, setObsView] = useState<"none" | "form" | "list">("none");
+
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -122,9 +124,15 @@ export default function Layout() {
               : pathname.replace("/", "").charAt(0).toUpperCase() +
                 pathname.slice(2)}
           </h2>
+          {pathname.includes("/observaciones") && (
+            <div style={{ display: "flex", gap: "1rem", marginLeft: "auto" }}>
+              <button className="oprof-btn" onClick={() => setObsView("form")}>Agregar observación</button>
+              <button className="oprof-btn" onClick={() => setObsView("list")}>Listar observaciones</button>
+            </div>
+          )}
         </header>
         <main className="content">
-          <Outlet />
+          <Outlet context={{ obsView, setObsView }} />
         </main>
       </div>
     </div>

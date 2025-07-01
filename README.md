@@ -337,4 +337,52 @@ Esta sección describe las principales funciones y el flujo de trabajo para el u
 
 ---
 
+## 👨‍🏫 **Flujo del Profesor (2024)**
+
+El sistema ofrece una experiencia moderna, clara y responsiva para profesores:
+
+### **Dashboard del Profesor**
+- Minimalista: solo muestra el título "Panel del Profesor".
+- Sin botones ni widgets extra para máxima concentración.
+
+### **Gestión de Cursos**
+- Lista de cursos asignados al profesor.
+- Botón para ver estudiantes de cada curso: abre un modal responsive con la lista completa.
+- Feedback visual de carga y errores.
+- Modal accesible y fácil de cerrar.
+
+### **Gestión de Calificaciones**
+- Selección en cascada: primero curso, luego estudiante, luego materia.
+- Formulario para ingresar calificación, con validaciones y feedback.
+- Tabla de calificaciones recientes (máx. 5).
+- CRUD completo: crear, editar, eliminar calificaciones.
+- Mensajes de éxito/error claros y visibles.
+- Layout y controles 100% responsivos.
+
+### **Registro de Asistencia**
+- Selección de curso (solo los del profesor).
+- Al seleccionar curso, muestra estudiantes automáticamente.
+- Checks para marcar asistencia (presente/ausente) con feedback visual inmediato.
+- Botón para guardar asistencia, deshabilitado mientras guarda o si no hay estudiantes.
+- Mensaje de guardado destacado y visible.
+
+### **Observaciones**
+- Listado de observaciones recientes por estudiante.
+- Colores diferenciados para positiva, negativa y neutro.
+- Acciones rápidas y feedback visual.
+
+### **Responsividad y Accesibilidad**
+- Todos los componentes clave se adaptan a pantallas pequeñas.
+- Botones y campos con buen tamaño táctil.
+- Mensajes de feedback claros y accesibles.
+
+---
+
+## 🧑‍💻 **¿Cómo contribuir o personalizar?**
+- El código está modularizado y documentado.
+- Puedes agregar nuevas vistas, widgets o flujos fácilmente.
+- Sugerencias: agregar paginación, búsqueda, edición en línea, mejoras de accesibilidad, o widgets personalizados en el dashboard.
+
+---
+
 > Proyecto desarrollado por Epimete0 y colaboradores.

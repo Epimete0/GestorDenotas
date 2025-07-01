@@ -29,6 +29,16 @@ export const observacionRepository = {
       orderBy: { id: "desc" },
     }),
 
+  findByProfesor: (profesorId: number) =>
+    prisma.observacion.findMany({
+      where: { profesorId },
+      include: {
+        estudiante: true,
+        profesor: true,
+      },
+      orderBy: { id: "desc" },
+    }),
+
   create: (data: {
     estudianteId: number;
     profesorId: number;

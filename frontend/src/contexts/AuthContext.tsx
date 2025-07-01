@@ -33,6 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Verificar si hay un usuario guardado en localStorage al cargar la app
     const token = localStorage.getItem('authToken');
     const savedUser = localStorage.getItem('user');
+    console.log('Al recargar, usuario en localStorage:', savedUser); // DEBUG
     
     if (token && savedUser) {
       try {
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Verificar token con el backend
         apiVerifyToken(token)
           .then(response => {
+            console.log('Respuesta de verificación de token:', response); // DEBUG
             if (response.success) {
               setUser(response.data.user);
               localStorage.setItem('user', JSON.stringify(response.data.user));

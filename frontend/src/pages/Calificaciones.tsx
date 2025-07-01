@@ -250,160 +250,59 @@ export default function Calificaciones() {
 
   return (
     <div className="calificaciones-page">
-      <h2 className="page-title">Gestión de Calificaciones</h2>
-      <div className="calificaciones-grid">
-        {/* Panel de notas */}
-        <div className="notas-panel card">
-          <div className="panel-header">
-            <label htmlFor="select-student">Estudiante:</label>
-            <select
-              id="select-student"
-              value={selectedStudent}
-              onChange={(e) => {
-                setError(null);
-                const v = e.target.value;
-                setSelectedStudent(v === "" ? "" : Number(v));
-              }}
-              className="select-minimal"
-            >
-              <option value="">-- Selecciona --</option>
-              {students.map((st) => (
-                <option key={st.id} value={st.id}>
-                  {st.nombre} {st.apellido}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {error && <p className="feedback-minimal error">Error: {error}</p>}
-          {loading && <p className="feedback-minimal">Cargando calificaciones…</p>}
-
-          {!loading && selectedStudent !== "" && (
-            <ul className="grades-list">
-              {grades.map((g) => (
-                <li key={g.id} className="grade-item">
-                  <span className="subject-name">{g.asignatura.nombre}</span>
-                  <span className="subject-value">{g.valor.toFixed(2)}</span>
-                  <time className="subject-date">
-                    {new Date(g.fecha).toLocaleDateString()}
-                  </time>
-                  <span className="professor-name">
-                    {g.profesor.nombre} {g.profesor.apellido}
-                  </span>
-                  <button
-                    onClick={() => openModal(g)}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent-secondary)', cursor: 'pointer', marginLeft: 8 }}
-                    title="Editar o eliminar"
-                  >
-                    {IconEdit}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {modalGrade && (
-            <EditarNotaModal
-              grade={modalGrade}
-              open={!!modalGrade}
-              onClose={closeModal}
-              onSave={handleModalSave}
-              onDelete={handleModalDelete}
-              loading={modalLoading}
-              error={modalError}
-            />
-          )}
+      <h2 className="page-title">Calificaciones de Estudiantes</h2>
+      <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginBottom: 32 }}>
+        Gestiona y visualiza las calificaciones de los estudiantes para todos los cursos.
+      </p>
+      <form className="add-form" style={{ maxWidth: 480, margin: '0 auto', background: 'var(--bg-card)', borderRadius: 16, padding: 32, boxShadow: 'var(--shadow-light)' }} onSubmit={handleAdd}>
+        <div className="form-group">
+          <label>Nombre del Estudiante</label>
+          <select value={selectedStudent} onChange={e => setSelectedStudent(Number(e.target.value))} required>
+            <option value="">Selecciona un estudiante</option>
+            {students.map(s => (
+              <option key={s.id} value={s.id}>{s.nombre} {s.apellido}</option>
+            ))}
+          </select>
         </div>
-
-        {/* Panel de formulario */}
-        <div className="form-panel card">
-          <h3 className="panel-title">Agregar Calificación</h3>
-          <form onSubmit={handleAdd} className="add-form">
-            <div className="form-group">
-              <label htmlFor="select-subject">Asignatura</label>
-              <select
-                id="select-subject"
-                value={subjectId}
-                onChange={(e) =>
-                  setSubjectId(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                required
-                className="select-minimal"
-              >
-                <option value="">-- Selecciona --</option>
-                {asignaturas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="select-professor">Profesor</label>
-              <select
-                id="select-professor"
-                value={profesorId}
-                onChange={(e) =>
-                  setProfesorId(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                required
-                className="select-minimal"
-              >
-                <option value="">-- Selecciona --</option>
-                {profesores.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nombre} {p.apellido}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="input-value">Valor</label>
-              <input
-                id="input-value"
-                type="number"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="Ej: 5.5"
-                min="1"
-                max="7"
-                step="0.1"
-                required
-                className="input-minimal"
-              />
-            </div>
-
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={formLoading}
-            >
-              {formLoading ? "Agregando..." : "Agregar"}
-            </button>
-            
-            {formMsg && (
-              <p className={`feedback-minimal ${formMsg.includes("✅") ? "success" : "error"}`}>
-                {formMsg}
-              </p>
-            )}
-          </form>
+        <div className="form-group">
+          <label>Curso</label>
+          <select value={subjectId} onChange={e => setSubjectId(Number(e.target.value))} required>
+            <option value="">Selecciona un curso</option>
+            {asignaturas.map(a => (
+              <option key={a.id} value={a.id}>{a.nombre}</option>
+            ))}
+          </select>
         </div>
-
-        {/* Botones de exportación */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <button onClick={() => exportarPDF(grades)} disabled={grades.length === 0} className="btn-minimal">
-            Exportar a PDF
-          </button>
-          <button onClick={() => exportarExcel(grades)} disabled={grades.length === 0} className="btn-minimal">
-            Exportar a Excel
+        <div className="form-group">
+          <label>Profesor</label>
+          <select value={profesorId} onChange={e => setProfesorId(Number(e.target.value))} required>
+            <option value="">Selecciona un profesor</option>
+            {profesores.map(p => (
+              <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Calificación</label>
+          <input
+            type="number"
+            min={1}
+            max={7}
+            step={0.01}
+            placeholder="Ingresa la calificación"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            required
+          />
+        </div>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 24 }}>
+          <button className="btn-primary" type="submit" disabled={formLoading} style={{ minWidth: 120 }}>
+            Guardar calificación
           </button>
         </div>
-      </div>
+        {formMsg && <div className={formMsg.startsWith('✅') ? 'feedback success' : 'feedback error'}>{formMsg}</div>}
+      </form>
+      {/* Aquí puedes mostrar el listado de calificaciones si lo deseas debajo o al costado */}
     </div>
   );
 }

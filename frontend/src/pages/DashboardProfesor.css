@@ -1,0 +1,190 @@
+/* DashboardProfesor.css: estilos exclusivos para el dashboard del profesor */
+
+.prof-bg {
+  min-height: 100vh;
+  background: #111418;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', 'Noto Sans', sans-serif;
+}
+
+.prof-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.prof-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #293038;
+  padding: 0.75rem 2.5rem;
+  background: #111418;
+}
+
+.prof-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #fff;
+}
+
+.prof-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prof-title {
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: bold;
+  letter-spacing: -0.015em;
+}
+
+.prof-header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.prof-menu {
+  display: flex;
+  gap: 2.25rem;
+}
+
+.prof-menu a {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.prof-menu a:hover {
+  color: #1978e5;
+}
+
+.prof-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-left: 1.5rem;
+}
+
+.prof-content {
+  flex: 1;
+  display: flex;
+  justify-content: stretch;
+  align-items: flex-start;
+  padding: 2.5rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.prof-content-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.prof-title-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+
+.prof-dashboard-title {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  min-width: 18rem;
+  letter-spacing: 0.01em;
+}
+
+.prof-btn-row {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  justify-content: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.prof-btn {
+  min-width: 84px;
+  max-width: 480px;
+  height: 48px;
+  padding: 0 1.25rem;
+  background: #1978e5;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.prof-btn:hover {
+  background: #125bb5;
+}
+
+/* Responsive design para el layout del profesor */
+@media (max-width: 900px) {
+  .prof-header {
+    padding: 0.75rem 1rem;
+  }
+  .prof-menu {
+    gap: 1.25rem;
+  }
+  .prof-content {
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .prof-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0.25rem;
+  }
+  .prof-header-left {
+    gap: 0.5rem;
+  }
+  .prof-title {
+    font-size: 1rem;
+  }
+  .prof-header-right {
+    gap: 1rem;
+  }
+  .prof-menu {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .prof-avatar {
+    width: 32px;
+    height: 32px;
+    margin-left: 0.5rem;
+  }
+  .prof-content {
+    padding: 0.5rem 0.1rem;
+  }
+  .prof-content-inner {
+    padding: 0;
+  }
+} 

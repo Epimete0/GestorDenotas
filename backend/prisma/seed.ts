@@ -32,12 +32,12 @@ async function main() {
     profesores.push(await prisma.profesor.create({ data: prof }));
   }
 
-  // Crear usuarios para profesores
+  // Crear usuarios para profesores con correos personalizados
   await prisma.usuario.upsert({
-    where: { email: 'profesor1@demo.com' },
+    where: { email: 'sofia.ramirez@demo.com' },
     update: {},
     create: {
-      email: 'profesor1@demo.com',
+      email: 'sofia.ramirez@demo.com',
       password: passwordHash,
       rol: 'profesor',
       profesorId: profesores[0].id,
@@ -45,13 +45,35 @@ async function main() {
     },
   });
   await prisma.usuario.upsert({
-    where: { email: 'profesor2@demo.com' },
+    where: { email: 'carlos.munoz@demo.com' },
     update: {},
     create: {
-      email: 'profesor2@demo.com',
+      email: 'carlos.munoz@demo.com',
       password: passwordHash,
       rol: 'profesor',
       profesorId: profesores[1].id,
+      activo: true,
+    },
+  });
+  await prisma.usuario.upsert({
+    where: { email: 'valentina.lopez@demo.com' },
+    update: {},
+    create: {
+      email: 'valentina.lopez@demo.com',
+      password: passwordHash,
+      rol: 'profesor',
+      profesorId: profesores[2].id,
+      activo: true,
+    },
+  });
+  await prisma.usuario.upsert({
+    where: { email: 'diego.fernandez@demo.com' },
+    update: {},
+    create: {
+      email: 'diego.fernandez@demo.com',
+      password: passwordHash,
+      rol: 'profesor',
+      profesorId: profesores[3].id,
       activo: true,
     },
   });

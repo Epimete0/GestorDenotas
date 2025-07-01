@@ -502,7 +502,7 @@ export default function Cursos() {
   return (
     <div className="courses-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2>Administración de Cursos</h2>
+      <h2>Administración de Cursos</h2>
         <button
           onClick={() => setMostrarCrearModal(true)}
           style={{

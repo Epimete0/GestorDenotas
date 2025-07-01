@@ -69,3 +69,10 @@ export async function removeAsignaturaFromCourse(cursoId: number, asignaturaId: 
 
   return courseRepository.removeAsignatura(cursoId, asignaturaId);
 }
+
+export async function getCoursesByProfesor(profesorId: number) {
+  if (!profesorId || profesorId <= 0) {
+    throw new Error("ID de profesor inválido");
+  }
+  return courseRepository.findByProfesor(profesorId);
+}

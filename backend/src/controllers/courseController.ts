@@ -8,6 +8,7 @@ import {
   deleteCourse,
   addAsignaturaToCourse,
   removeAsignaturaFromCourse,
+  getCoursesByProfesor,
 } from "../services/courseService";
 
 const router = Router();
@@ -92,6 +93,17 @@ router.delete("/:id/asignaturas/:asignaturaId", async (req: Request, res: Respon
     const asignaturaId = Number(req.params.asignaturaId);
     await removeAsignaturaFromCourse(cursoId, asignaturaId);
     res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/courses/profesor/:profesorId - Obtener cursos donde el profesor es jefe
+router.get("/profesor/:profesorId", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const profesorId = Number(req.params.profesorId);
+    const cursos = await getCoursesByProfesor(profesorId);
+    res.json({ cursos });
   } catch (err) {
     next(err);
   }

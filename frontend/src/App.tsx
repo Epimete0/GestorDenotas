@@ -14,6 +14,12 @@ import Calendar from "./pages/Calendar";
 import Estudiantes from "./pages/Estudiantes";
 import Profesores from "./pages/Profesores";
 import Asignaturas from "./pages/Asignaturas";
+import DashboardProfesor from "./pages/DashboardProfesor";
+import ProfesorLayout from "./pages/ProfesorLayout";
+import CursosProfesor from "./pages/CursosProfesor";
+import ObservacionesProfesor from "./pages/ObservacionesProfesor";
+import AsistenciaProfesor from "./pages/AsistenciaProfesor";
+import CalificacionesProfesor from "./pages/CalificacionesProfesor";
 
 function NoAutorizado() {
   return (
@@ -32,6 +38,14 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ProfesorRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role !== 'profesor') {
+    return <NoAutorizado />;
+  }
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -39,6 +53,19 @@ export default function App() {
         <Routes>
           {/* Ruta pública para login */}
           <Route path="/login" element={<Login />} />
+          
+          {/* Ruta exclusiva para profesores, con layout propio y rutas hijas */}
+          <Route path="/dashboard-profesor/*" element={
+            <ProfesorRoute>
+              <ProfesorLayout />
+            </ProfesorRoute>
+          }>
+            <Route index element={<DashboardProfesor />} />
+            <Route path="cursos" element={<CursosProfesor />} />
+            <Route path="calificaciones" element={<CalificacionesProfesor />} />
+            <Route path="observaciones" element={<ObservacionesProfesor />} />
+            <Route path="asistencia" element={<AsistenciaProfesor />} />
+          </Route>
           
           {/* Rutas protegidas */}
           <Route path="/*" element={

@@ -120,6 +120,10 @@ export interface Grade {
     id: number;
     nombre: string;
     apellido: string;
+    curso?: {
+      id: number;
+      nombre: string;
+    };
   };
 }
 
@@ -201,6 +205,13 @@ export async function deleteCourse(id: number): Promise<void> {
     method: "DELETE",
   });
   if (!res.ok) throw new Error(`Error deleting course: ${res.statusText}`);
+}
+
+export async function getCursosByProfesor(profesorId: number): Promise<Curso[]> {
+  const res = await fetch(`${API_BASE}/api/courses/profesor/${profesorId}`);
+  if (!res.ok) throw new Error(`Error fetching cursos by profesor: ${res.statusText}`);
+  const { cursos } = await res.json();
+  return cursos;
 }
 
 // ——————————————
@@ -463,6 +474,13 @@ export async function deleteGrade(id: number): Promise<void> {
   if (!res.ok) throw new Error(`Error deleting grade: ${res.statusText}`);
 }
 
+export async function getGradesByProfesor(profesorId: number): Promise<Grade[]> {
+  const res = await fetch(`${API_BASE}/api/grades/profesor/${profesorId}`);
+  if (!res.ok) throw new Error(`Error fetching grades by profesor: ${res.statusText}`);
+  const { calificaciones } = await res.json();
+  return calificaciones;
+}
+
 // ——————————————
 //  Asistencias
 // ——————————————
@@ -636,4 +654,11 @@ export async function deleteObservacion(id: number): Promise<void> {
     method: "DELETE"
   });
   if (!res.ok) throw new Error(`Error deleting observacion: ${res.statusText}`);
+}
+
+export async function getObservacionesByProfesor(profesorId: number): Promise<Observacion[]> {
+  const res = await fetch(`${API_BASE}/api/observaciones/profesor/${profesorId}`);
+  if (!res.ok) throw new Error(`Error fetching observaciones by profesor: ${res.statusText}`);
+  const { observaciones } = await res.json();
+  return observaciones;
 }

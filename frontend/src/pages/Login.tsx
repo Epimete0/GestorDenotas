@@ -36,8 +36,13 @@ export default function Login() {
       const success = await login(formData.email, formData.password);
       
       if (success) {
-        // Redirigir al dashboard
-        navigate("/");
+        // Obtener el usuario actualizado del localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === 'profesor') {
+          navigate('/dashboard-profesor');
+        } else {
+          navigate('/');
+        }
       } else {
         setError("Credenciales incorrectas. Revisa las credenciales de demostración.");
       }

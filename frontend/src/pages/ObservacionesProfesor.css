@@ -1,0 +1,405 @@
+/* ObservacionesProfesor.css: estilos exclusivos para la página de registro de observaciones del profesor */
+
+.oprof-title-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+
+.oprof-dashboard-title {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  min-width: 18rem;
+}
+
+.oprof-form {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.oprof-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.oprof-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+  flex: 1;
+}
+
+.oprof-label-text {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.oprof-input {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  resize: none;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  color: #fff;
+  background: #293038;
+  border: none;
+  height: 3.5rem;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+  outline: none;
+}
+
+.oprof-input:focus {
+  outline: none;
+  border: none;
+}
+
+.oprof-input::placeholder {
+  color: #9daab8;
+}
+
+.oprof-textarea {
+  min-height: 9rem;
+}
+
+.oprof-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}
+
+.oprof-btn {
+  min-width: 84px;
+  max-width: 480px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  height: 2.5rem;
+  padding: 0 1rem;
+  background: #1978e5;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  transition: background 0.2s;
+}
+
+.oprof-btn:hover {
+  background: #125bb5;
+}
+
+.oprof-btns-fixed {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+  align-items: center;
+}
+
+.fab-container {
+  position: fixed;
+  right: 2.2rem;
+  bottom: 2.2rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+}
+
+.fab-main {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1978e5;
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  font-size: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.fab-main:hover {
+  background: #125bb5;
+  transform: scale(1.08);
+}
+
+.fab-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.fab-container.open .fab-actions {
+  pointer-events: auto;
+}
+
+.fab-action {
+  margin-bottom: 0.7rem;
+  min-width: 140px;
+  height: 40px;
+  border-radius: 20px;
+  background: #fff;
+  color: #1978e5;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.7em;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 0 1.2em;
+  font-weight: 500;
+}
+
+.fab-container.open .fab-action {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.fab-action:hover {
+  background: #1978e5;
+  color: #fff;
+}
+
+.fab-action svg {
+  font-size: 1.2em;
+}
+
+.oprof-obs-list {
+  padding: 0;
+  list-style: none;
+  margin: 0;
+}
+
+.oprof-obs-card {
+  margin-bottom: 1.5rem;
+  background: #232323;
+  border-radius: 14px;
+  padding: 1.2rem 1.5rem 1.2rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.oprof-obs-estado {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+  text-align: left;
+}
+
+.oprof-obs-estado.negativa { color: #e53935; }
+.oprof-obs-estado.positiva { color: #43a047; }
+.oprof-obs-estado.neutro { color: #bdbdbd; }
+
+.oprof-obs-texto {
+  font-size: 1.05rem;
+  color: #e0e0e0;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  word-break: break-word;
+}
+
+.oprof-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: auto;
+  scrollbar-color: #888 #23272f;
+}
+
+/* Scrollbar para navegadores Webkit (Chrome, Edge, Safari) */
+.oprof-table-wrap::-webkit-scrollbar {
+  height: 12px;
+}
+.oprof-table-wrap::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+.oprof-table-wrap::-webkit-scrollbar-track {
+  background: #23272f;
+  border-radius: 6px;
+}
+
+.oprof-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #181b1f;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.oprof-table th, .oprof-table td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+
+.oprof-table th {
+  background: #23272b;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  border-bottom: 1px solid #293038;
+}
+
+.oprof-table td {
+  color: #e0e0e0;
+  font-size: 0.98rem;
+  border-bottom: 1px solid #23272b;
+}
+
+.oprof-table tr:last-child td {
+  border-bottom: none;
+}
+
+.oprof-table tr:hover td {
+  background: #23272b;
+}
+
+.oprof-mockup-outer {
+  min-height: unset;
+  display: unset;
+  align-items: unset;
+  justify-content: unset;
+  background: unset;
+}
+
+.oprof-mockup-wrap {
+  width: 100%;
+  max-width: 900px;
+  background: none;
+  border-radius: 18px;
+  box-sizing: border-box;
+  display: block;
+}
+
+.oprof-mockup-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.oprof-mockup-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 0.2em;
+  letter-spacing: 0;
+}
+
+.oprof-mockup-subtitle {
+  font-size: 1.1rem;
+  color: #9daab8;
+  margin-bottom: 1.5em;
+  font-weight: 400;
+}
+
+.oprof-mockup-search-row {
+  margin-bottom: 1.5em;
+}
+
+.oprof-mockup-search-box {
+  width: 100%;
+  background: #23272f;
+  border-radius: 0.7em;
+  display: flex;
+  align-items: center;
+  padding: 0.5em 1.2em;
+}
+
+.oprof-mockup-search-icon {
+  color: #9daab8;
+  font-size: 1.2rem;
+  margin-right: 0.7rem;
+}
+
+.oprof-mockup-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 0.7em 0.5em;
+  outline: none;
+}
+.oprof-mockup-search-input::placeholder {
+  color: #9daab8;
+}
+
+.oprof-mockup-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #181b20;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 700px;
+}
+
+.oprof-mockup-table th, .oprof-mockup-table td {
+  padding: 1.3rem 1.5rem;
+  text-align: left;
+  font-size: 1.0rem;
+}
+
+.oprof-mockup-table th {
+  background: #23272b;
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 1px solid #293038;
+}
+
+.oprof-mockup-table td {
+  color: #e0e0e0;
+  border-bottom: 1px solid #23272b;
+  background: #181b20;
+}
+
+.oprof-mockup-table tr:last-child td {
+  border-bottom: none;
+}
+
+.oprof-mockup-link {
+  color: #e0e0e0;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.oprof-mockup-link:hover {
+  color: #1978e5;
+}
+
+/* Estilos para el contenedor de la página que centra el contenido */
+.oprof-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 4rem 2rem;
+  background-color: #121519;
+  min-height: 100vh;
+} 
