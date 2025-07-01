@@ -1,0 +1,134 @@
+/* Asistencia.css */
+
+.asistencia-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: var(--text-primary);
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.asistencia-card {
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  color: var(--text-primary);
+}
+
+.asistencia-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.asistencia-form label,
+.radio-group-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.asistencia-form select,
+.asistencia-form input[type="date"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border 0.2s;
+}
+
+.asistencia-form select:focus,
+.asistencia-form input[type="date"]:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.radio-group input {
+  margin-right: 0.25rem;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--accent-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-primary);
+  color: var(--black);
+}
+
+.feedback {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.feedback.success {
+  background-color: var(--success-dark, #4ade80);
+  color: #fff;
+}
+
+.feedback.error {
+  background-color: var(--error-dark, #f87171);
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --black: #f8f9fa;
+    --oxford-blue: #8aa4c7;
+    --blue-header: #5a7396;
+    --orange-web: #ffb84d;
+    --platinum: #2a2d3a;
+    --white: #1a1d29;
+    --bg-primary: #1a1d29;
+    --bg-secondary: #212530;
+    --bg-card: #242938;
+    --text-primary: #f8f9fa;
+    --text-secondary: #b8c5d1;
+    --text-muted: #8a9199;
+    --border-light: #2a2d3a;
+    --border-medium: #3a3f4f;
+    --accent-primary: #ffb84d;
+    --accent-secondary: #6b8db5;
+    --shadow-light: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-medium: 0 4px 12px rgba(0,0,0,0.25);
+    --shadow-heavy: 0 8px 24px rgba(0,0,0,0.4);
+    --success-dark: #4ade80;
+    --warning-dark: #fbbf24;
+    --error-dark: #f87171;
+    --info-dark: #60a5fa;
+  }
+}
