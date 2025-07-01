@@ -20,28 +20,16 @@ async function main() {
     },
   });
 
-  // Crear profesores demo si no existen
-  let profesor1 = await prisma.profesor.findFirst();
-  if (!profesor1) {
-    profesor1 = await prisma.profesor.create({
-      data: {
-        nombre: 'Juan',
-        apellido: 'Pérez',
-        edad: 40,
-        sexo: 'M',
-      },
-    });
-  }
-  let profesor2 = await prisma.profesor.findFirst({ where: { id: { not: profesor1.id } } });
-  if (!profesor2) {
-    profesor2 = await prisma.profesor.create({
-      data: {
-        nombre: 'María',
-        apellido: 'García',
-        edad: 35,
-        sexo: 'F',
-      },
-    });
+  // Profesores realistas
+  const profesoresData = [
+    { nombre: 'Sofía', apellido: 'Ramírez', edad: 38, sexo: 'F' },
+    { nombre: 'Carlos', apellido: 'Muñoz', edad: 45, sexo: 'M' },
+    { nombre: 'Valentina', apellido: 'López', edad: 29, sexo: 'F' },
+    { nombre: 'Diego', apellido: 'Fernández', edad: 50, sexo: 'M' },
+  ];
+  const profesores: { id: number; nombre: string; apellido: string; edad: number; sexo: string; }[] = [];
+  for (const prof of profesoresData) {
+    profesores.push(await prisma.profesor.create({ data: prof }));
   }
 
   // Crear usuarios para profesores
@@ -52,7 +40,7 @@ async function main() {
       email: 'profesor1@demo.com',
       password: passwordHash,
       rol: 'profesor',
-      profesorId: profesor1.id,
+      profesorId: profesores[0].id,
       activo: true,
     },
   });
@@ -63,7 +51,7 @@ async function main() {
       email: 'profesor2@demo.com',
       password: passwordHash,
       rol: 'profesor',
-      profesorId: profesor2.id,
+      profesorId: profesores[1].id,
       activo: true,
     },
   });
@@ -78,30 +66,44 @@ async function main() {
   await prisma.curso.deleteMany();
   await prisma.asignatura.deleteMany();
 
-  // Crear Asignaturas
+  // Asignaturas
   const asignaturas = await Promise.all(
-    ['Matemáticas', 'Lenguaje', 'Inglés', 'Historia', 'Ciencias'].map(
-      (nombre) => prisma.asignatura.create({ data: { nombre } })
-    )
+    [
+      'Matemáticas',
+      'Lengua y Literatura',
+      'Inglés',
+      'Historia',
+      'Ciencias Naturales',
+      'Educación Física',
+      'Artes Visuales',
+    ].map((nombre) => prisma.asignatura.create({ data: { nombre } }))
   );
 
-  // Relacionar Profesores ↔ Asignaturas (cada uno imparte 2)
+  // Relacionar Profesores ↔ Asignaturas
   await prisma.profesorAsignatura.createMany({
     data: [
-      { profesorId: profesor1.id, asignaturaId: asignaturas[0].id }, // Matemáticas
-      { profesorId: profesor1.id, asignaturaId: asignaturas[1].id }, // Lenguaje
-      { profesorId: profesor2.id, asignaturaId: asignaturas[2].id }, // Inglés
-      { profesorId: profesor2.id, asignaturaId: asignaturas[3].id }, // Historia
+      { profesorId: profesores[0].id, asignaturaId: asignaturas[0].id }, // Sofía - Matemáticas
+      { profesorId: profesores[0].id, asignaturaId: asignaturas[1].id }, // Sofía - Lengua
+      { profesorId: profesores[1].id, asignaturaId: asignaturas[2].id }, // Carlos - Inglés
+      { profesorId: profesores[1].id, asignaturaId: asignaturas[3].id }, // Carlos - Historia
+      { profesorId: profesores[2].id, asignaturaId: asignaturas[4].id }, // Valentina - Ciencias
+      { profesorId: profesores[3].id, asignaturaId: asignaturas[5].id }, // Diego - Educación Física
+      { profesorId: profesores[3].id, asignaturaId: asignaturas[6].id }, // Diego - Artes Visuales
     ],
   });
 
-  // Crear Cursos
+  // Cursos realistas
   const cursos = await Promise.all(
-    ['1° Básico A', '1° Básico B', '2° Básico A', '2° Básico B'].map((nombre, i) =>
+    [
+      { nombre: '1° Básico A', jefeId: profesores[0].id },
+      { nombre: '1° Básico B', jefeId: profesores[1].id },
+      { nombre: '2° Básico A', jefeId: profesores[2].id },
+      { nombre: '2° Básico B', jefeId: profesores[3].id },
+    ].map((c) =>
       prisma.curso.create({
         data: {
-          nombre,
-          jefeId: i % 2 === 0 ? profesor1.id : profesor2.id,
+          nombre: c.nombre,
+          jefeId: c.jefeId,
           planDeEstudio: {
             create: asignaturas.map((asig) => ({ asignaturaId: asig.id })),
           },
@@ -110,52 +112,88 @@ async function main() {
     )
   );
 
-  // Crear Estudiantes
-  const estudiantes = await Promise.all(
-    Array.from({ length: 10 }).map((_, i) =>
-      prisma.estudiante.create({
+  // Estudiantes realistas
+  const estudiantesData = [
+    { nombre: 'Martina', apellido: 'Gómez', edad: 7, sexo: 'F' },
+    { nombre: 'Lucas', apellido: 'Soto', edad: 8, sexo: 'M' },
+    { nombre: 'Antonia', apellido: 'Vera', edad: 7, sexo: 'F' },
+    { nombre: 'Benjamín', apellido: 'Torres', edad: 8, sexo: 'M' },
+    { nombre: 'Florencia', apellido: 'Navarro', edad: 7, sexo: 'F' },
+    { nombre: 'Matías', apellido: 'Pizarro', edad: 8, sexo: 'M' },
+    { nombre: 'Josefa', apellido: 'Silva', edad: 7, sexo: 'F' },
+    { nombre: 'Agustín', apellido: 'Rojas', edad: 8, sexo: 'M' },
+    { nombre: 'Valentina', apellido: 'Mora', edad: 7, sexo: 'F' },
+    { nombre: 'Tomás', apellido: 'Castro', edad: 8, sexo: 'M' },
+    { nombre: 'Isidora', apellido: 'Fuentes', edad: 7, sexo: 'F' },
+    { nombre: 'Joaquín', apellido: 'Saavedra', edad: 8, sexo: 'M' },
+    { nombre: 'Emilia', apellido: 'Cáceres', edad: 7, sexo: 'F' },
+    { nombre: 'Vicente', apellido: 'Reyes', edad: 8, sexo: 'M' },
+    { nombre: 'Amanda', apellido: 'Ortega', edad: 7, sexo: 'F' },
+    { nombre: 'Gabriel', apellido: 'Méndez', edad: 8, sexo: 'M' },
+  ];
+  const estudiantes: { id: number; nombre: string; apellido: string; edad: number; sexo: string; cursoId: number; }[] = [];
+  for (let i = 0; i < estudiantesData.length; i++) {
+    estudiantes.push(
+      await prisma.estudiante.create({
         data: {
-          nombre: `Estud${i + 1}`,
-          apellido: `Apellido${i + 1}`,
-          edad: 12 + (i % 5),
-          sexo: i % 2 === 0 ? 'M' : 'F',
+          ...estudiantesData[i],
           cursoId: cursos[i % cursos.length].id,
         },
       })
-    )
-  );
+    );
+  }
 
-  // Crear Calificaciones y Observaciones demo
+  // Observaciones realistas
+  const observacionesPositivas = [
+    'Participa activamente en clase y muestra interés por aprender.',
+    'Excelente comportamiento y compañerismo.',
+    'Entrega sus tareas a tiempo y con dedicación.',
+    'Demuestra creatividad en los trabajos escolares.',
+    'Colabora con sus compañeros y respeta las normas.',
+  ];
+  const observacionesNegativas = [
+    'Debe mejorar la puntualidad en la llegada a clases.',
+    'Presenta dificultades para concentrarse en clase.',
+    'No entrega tareas en los plazos establecidos.',
+    'Necesita participar más en las actividades grupales.',
+    'Debe mejorar la organización de su material escolar.',
+  ];
+
+  // Calificaciones realistas y observaciones
   for (const est of estudiantes) {
-    for (const p of await prisma.cursoAsignatura.findMany({ where: { cursoId: est.cursoId } })) {
+    const plan = await prisma.cursoAsignatura.findMany({ where: { cursoId: est.cursoId } });
+    for (const p of plan) {
+      // Asignar profesor según asignatura
+      const profAsig = await prisma.profesorAsignatura.findFirst({ where: { asignaturaId: p.asignaturaId } });
       await prisma.calificacion.create({
         data: {
           estudianteId: est.id,
           asignaturaId: p.asignaturaId,
-          profesorId: p.asignaturaId <= asignaturas[1].id ? profesor1.id : profesor2.id,
-          valor: parseFloat((Math.random() * 5 + 1).toFixed(2)),
+          profesorId: profAsig?.profesorId || profesores[0].id,
+          valor: parseFloat((Math.random() * 2 + 4).toFixed(1)), // Notas entre 4.0 y 6.0
         },
       });
     }
+    // Observaciones positivas y negativas alternadas
     await prisma.observacion.create({
       data: {
         estudianteId: est.id,
-        profesorId: profesor1.id,
-        texto: 'Muy participativo en clase.',
+        profesorId: profesores[estudiantes.indexOf(est) % profesores.length].id,
+        texto: observacionesPositivas[estudiantes.indexOf(est) % observacionesPositivas.length],
         estado: 'positiva',
       },
     });
     await prisma.observacion.create({
       data: {
         estudianteId: est.id,
-        profesorId: profesor2.id,
-        texto: 'Debe mejorar la puntualidad.',
+        profesorId: profesores[(estudiantes.indexOf(est) + 1) % profesores.length].id,
+        texto: observacionesNegativas[estudiantes.indexOf(est) % observacionesNegativas.length],
         estado: 'negativa',
       },
     });
   }
 
-  console.log('Seed de usuarios y profesores demo completado.');
+  console.log('Seed de datos realistas completado.');
 }
 
 main()
