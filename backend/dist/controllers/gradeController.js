@@ -18,7 +18,10 @@ router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { estudianteId, asignaturaId, profesorId, valor } = req.body;
         const nuevaNota = yield (0, gradeService_1.addGrade)(Number(estudianteId), Number(asignaturaId), Number(profesorId), Number(valor));
-        res.status(201).json({ calificacion: nuevaNota });
+        res.status(201).json({
+            success: true,
+            data: { calificacion: nuevaNota }
+        });
     }
     catch (err) {
         next(err);
@@ -28,7 +31,10 @@ router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const calificaciones = yield (0, gradeService_1.getEstadisticasCalificaciones)();
-        res.json({ estadisticas: calificaciones });
+        res.json({
+            success: true,
+            data: { estadisticas: calificaciones }
+        });
     }
     catch (err) {
         next(err);
@@ -38,18 +44,24 @@ router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function*
 router.get("/all", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const calificaciones = yield (0, gradeService_1.getAllGrades)();
-        res.json({ calificaciones });
+        res.json({
+            success: true,
+            data: { calificaciones }
+        });
     }
     catch (err) {
         next(err);
     }
 }));
-// GET /api/grades/:estudianteId - Obtener calificaciones por estudiante
+// GET /api/grades/estudiante/:estudianteId - Obtener calificaciones por estudiante
 router.get("/estudiante/:estudianteId", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const estudianteId = Number(req.params.estudianteId);
         const notas = yield (0, gradeService_1.getGrades)(estudianteId);
-        res.json({ calificaciones: notas });
+        res.json({
+            success: true,
+            data: { calificaciones: notas }
+        });
     }
     catch (err) {
         next(err);
@@ -60,7 +72,10 @@ router.get("/asignatura/:asignaturaId", (req, res, next) => __awaiter(void 0, vo
     try {
         const asignaturaId = Number(req.params.asignaturaId);
         const notas = yield (0, gradeService_1.getGradesByAsignatura)(asignaturaId);
-        res.json({ calificaciones: notas });
+        res.json({
+            success: true,
+            data: { calificaciones: notas }
+        });
     }
     catch (err) {
         next(err);
@@ -71,7 +86,10 @@ router.get("/profesor/:profesorId", (req, res, next) => __awaiter(void 0, void 0
     try {
         const profesorId = Number(req.params.profesorId);
         const notas = yield (0, gradeService_1.getGradesByProfesor)(profesorId);
-        res.json({ calificaciones: notas });
+        res.json({
+            success: true,
+            data: { calificaciones: notas }
+        });
     }
     catch (err) {
         next(err);
@@ -82,7 +100,10 @@ router.get("/id/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const id = Number(req.params.id);
         const calificacion = yield (0, gradeService_1.getGradeById)(id);
-        res.json({ calificacion });
+        res.json({
+            success: true,
+            data: { calificacion }
+        });
     }
     catch (err) {
         next(err);
@@ -98,7 +119,10 @@ router.put("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             asignaturaId: asignaturaId ? Number(asignaturaId) : undefined,
             profesorId: profesorId ? Number(profesorId) : undefined,
         });
-        res.json({ calificacion: calificacionActualizada });
+        res.json({
+            success: true,
+            data: { calificacion: calificacionActualizada }
+        });
     }
     catch (err) {
         next(err);

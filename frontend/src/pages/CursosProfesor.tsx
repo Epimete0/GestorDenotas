@@ -4,8 +4,7 @@ import { getCursosByProfesor, getEstudiantesByCurso } from "../services/api";
 import type { Curso, Student } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
-const avatarUrl =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCTUI7HfmIcEgaAbGJWLvmm8-ytm2abp0vZjKPrpYOjOqUncLiCxg3mb1Px0UuxAisjiy0nHYCO8p1pHxCT_3-jA-ydO5MPCPhrMhqkTxM35oNmpeIwzXMNWW5S7G0G6IpjaabxaliGsv8IN2qMrc4uOxeoseD2EfOAoSWAgFpPADLz9Tm5DekGPGPyhzzDLGWGlpmAGjKVpFD-a6ac0Yc2sE2q_jy5pRb9DdezU1iKX-Em5X35c1mp-eSmdueVYPdg6Ew5V6ZI46w";
+
 
 function CursosProfesor() {
   const { user } = useAuth();
@@ -25,7 +24,7 @@ function CursosProfesor() {
     setLoading(true);
     getCursosByProfesor(user.profesorId)
       .then(setCursos)
-      .catch((err) => setError(err.message))
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : "Error al cargar cursos"))
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -37,8 +36,8 @@ function CursosProfesor() {
     try {
       const estudiantes = await getEstudiantesByCurso(curso.id);
       setEstudiantes(estudiantes);
-    } catch (err: any) {
-      setModalError(err.message || 'Error al cargar estudiantes');
+    } catch (err: unknown) {
+      setModalError(err instanceof Error ? err.message : "Error al cargar estudiantes");
       setEstudiantes([]);
     } finally {
       setModalLoading(false);

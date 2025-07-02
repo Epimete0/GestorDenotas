@@ -24,7 +24,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       Number(profesorId),
       Number(valor)
     );
-    res.status(201).json({ calificacion: nuevaNota });
+    res.status(201).json({ 
+      success: true,
+      data: { calificacion: nuevaNota } 
+    });
   } catch (err) {
     next(err);
   }
@@ -34,7 +37,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const calificaciones = await getEstadisticasCalificaciones();
-    res.json({ estadisticas: calificaciones });
+    res.json({ 
+      success: true,
+      data: { estadisticas: calificaciones } 
+    });
   } catch (err) {
     next(err);
   }
@@ -44,20 +50,26 @@ router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
 router.get("/all", async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const calificaciones = await getAllGrades();
-    res.json({ calificaciones });
+    res.json({ 
+      success: true,
+      data: { calificaciones } 
+    });
   } catch (err) {
     next(err);
   }
 });
 
-// GET /api/grades/:estudianteId - Obtener calificaciones por estudiante
+// GET /api/grades/estudiante/:estudianteId - Obtener calificaciones por estudiante
 router.get(
   "/estudiante/:estudianteId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const estudianteId = Number(req.params.estudianteId);
       const notas = await getGrades(estudianteId);
-      res.json({ calificaciones: notas });
+      res.json({ 
+        success: true,
+        data: { calificaciones: notas } 
+      });
     } catch (err) {
       next(err);
     }
@@ -71,7 +83,10 @@ router.get(
     try {
       const asignaturaId = Number(req.params.asignaturaId);
       const notas = await getGradesByAsignatura(asignaturaId);
-      res.json({ calificaciones: notas });
+      res.json({ 
+        success: true,
+        data: { calificaciones: notas } 
+      });
     } catch (err) {
       next(err);
     }
@@ -85,7 +100,10 @@ router.get(
     try {
       const profesorId = Number(req.params.profesorId);
       const notas = await getGradesByProfesor(profesorId);
-      res.json({ calificaciones: notas });
+      res.json({ 
+        success: true,
+        data: { calificaciones: notas } 
+      });
     } catch (err) {
       next(err);
     }
@@ -99,7 +117,10 @@ router.get(
     try {
       const id = Number(req.params.id);
       const calificacion = await getGradeById(id);
-      res.json({ calificacion });
+      res.json({ 
+        success: true,
+        data: { calificacion } 
+      });
     } catch (err) {
       next(err);
     }
@@ -116,7 +137,10 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
       asignaturaId: asignaturaId ? Number(asignaturaId) : undefined,
       profesorId: profesorId ? Number(profesorId) : undefined,
     });
-    res.json({ calificacion: calificacionActualizada });
+    res.json({ 
+      success: true,
+      data: { calificacion: calificacionActualizada } 
+    });
   } catch (err) {
     next(err);
   }

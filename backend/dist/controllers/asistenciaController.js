@@ -16,7 +16,10 @@ const router = (0, express_1.Router)();
 router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const asistencias = yield (0, asistenciaService_1.getAllAsistencias)();
-        res.json({ asistencias });
+        res.json({
+            success: true,
+            data: { asistencias }
+        });
     }
     catch (err) {
         next(err);
@@ -37,7 +40,10 @@ router.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     try {
         const id = Number(req.params.id);
         const asistencia = yield (0, asistenciaService_1.getAsistenciaById)(id);
-        res.json({ asistencia });
+        res.json({
+            success: true,
+            data: { asistencia }
+        });
     }
     catch (err) {
         next(err);
@@ -48,7 +54,10 @@ router.get("/estudiante/:estudianteId", (req, res, next) => __awaiter(void 0, vo
     try {
         const estudianteId = Number(req.params.estudianteId);
         const asistencias = yield (0, asistenciaService_1.getAsistenciasByEstudiante)(estudianteId);
-        res.json({ asistencias });
+        res.json({
+            success: true,
+            data: { asistencias }
+        });
     }
     catch (err) {
         next(err);
@@ -59,7 +68,10 @@ router.get("/fecha/:fecha", (req, res, next) => __awaiter(void 0, void 0, void 0
     try {
         const fecha = new Date(req.params.fecha);
         const asistencias = yield (0, asistenciaService_1.getAsistenciasByFecha)(fecha);
-        res.json({ asistencias });
+        res.json({
+            success: true,
+            data: { asistencias }
+        });
     }
     catch (err) {
         next(err);
@@ -74,7 +86,10 @@ router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             fecha: new Date(fecha),
             estado,
         });
-        res.status(201).json({ asistencia: nuevaAsistencia });
+        res.status(201).json({
+            success: true,
+            data: { asistencia: nuevaAsistencia }
+        });
     }
     catch (err) {
         next(err);
@@ -89,7 +104,10 @@ router.put("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             fecha: fecha ? new Date(fecha) : undefined,
             estado,
         });
-        res.json({ asistencia: asistenciaActualizada });
+        res.json({
+            success: true,
+            data: { asistencia: asistenciaActualizada }
+        });
     }
     catch (err) {
         next(err);

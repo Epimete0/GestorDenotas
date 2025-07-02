@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getAsignaturas, createAsignatura, updateAsignatura, deleteAsignatura, getProfesores, addProfesorToAsignatura, removeProfesorFromAsignatura } from "../services/api";
 import type { Asignatura, Profesor } from "../services/api";
 import "./Estudiantes.css";
@@ -70,8 +70,8 @@ function CrearAsignaturaModal({ onClose, onAsignaturaCreada }: { onClose: () => 
 
       onAsignaturaCreada();
       onClose();
-    } catch (err: any) {
-      setError(err.message || "Error al crear la materia");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al crear la materia");
     } finally {
       setLoading(false);
     }
@@ -189,8 +189,8 @@ function EditarAsignaturaModal({ asignatura, onClose, onAsignaturaEditada }: { a
       });
       onAsignaturaEditada();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
@@ -333,8 +333,8 @@ function AsignarProfesorModal({ asignatura, onClose, onProfesorAsignado }: { asi
         setProfesoresDisponibles(prev => prev.filter(p => p.id !== profesorId));
       }
       onProfesorAsignado();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
@@ -351,8 +351,8 @@ function AsignarProfesorModal({ asignatura, onClose, onProfesorAsignado }: { asi
         setProfesoresDisponibles(prev => [...prev, profesor]);
       }
       onProfesorAsignado();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
@@ -441,9 +441,9 @@ function AsignarProfesorModal({ asignatura, onClose, onProfesorAsignado }: { asi
 }
 
 export default function Asignaturas() {
-  const [lista, setLista] = useState<Asignatura[]>([]);
-  const [cargando, setCargando] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [mostrarCrearModal, setMostrarCrearModal] = useState(false);
   const [asignaturaAEditar, setAsignaturaAEditar] = useState<Asignatura | null>(null);
   const [asignaturaAEliminar, setAsignaturaAEliminar] = useState<Asignatura | null>(null);
@@ -452,15 +452,11 @@ export default function Asignaturas() {
   const [errorEliminar, setErrorEliminar] = useState<string | null>(null);
 
   const cargarAsignaturas = () => {
-    setCargando(true);
-    setErr(null);
+    setLoading(true);
     getAsignaturas()
-      .then(setLista)
-      .catch((e) => {
-        console.error("Error al cargar asignaturas:", e);
-        setErr(e.message || "Error al cargar las materias");
-      })
-      .finally(() => setCargando(false));
+      .then((data) => setAsignaturas(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   };
 
   const handleEliminarAsignatura = async () => {
@@ -471,9 +467,9 @@ export default function Asignaturas() {
       await deleteAsignatura(asignaturaAEliminar.id);
       cargarAsignaturas();
       setAsignaturaAEliminar(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error al eliminar asignatura:", err);
-      setErrorEliminar(err.message || "Error al eliminar la materia");
+      setErrorEliminar(err instanceof Error ? err.message : "Error al eliminar la materia");
     } finally {
       setEliminando(false);
     }
@@ -483,32 +479,13 @@ export default function Asignaturas() {
     cargarAsignaturas();
   }, []);
 
-  if (cargando) return <p className="status">Cargando materias…</p>;
-  if (err) return (
-    <div className="estudiantes-container">
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <p className="status error">Error: {err}</p>
-        <button 
-          onClick={cargarAsignaturas}
-          style={{
-            padding: '0.75rem 1.5rem',
-            border: 'none',
-            borderRadius: 6,
-            background: 'var(--accent-secondary)',
-            color: '#fff',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            marginTop: '1rem'
-          }}
-        >
-          Reintentar
-        </button>
-      </div>
-    </div>
-  );
+  if (loading) return <p className="status-msg">Cargando asignaturas…</p>;
+  if (error) return <p className="status-msg error">Error: {error}</p>;
+
+  const asignaturasList = Array.isArray(asignaturas) ? asignaturas : [];
 
   return (
-    <div className="estudiantes-container">
+    <div className="asignaturas-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2>Administración de Materias</h2>
         <button
@@ -531,17 +508,17 @@ export default function Asignaturas() {
         </button>
       </div>
       
-      {lista.length === 0 && !cargando ? (
+      {asignaturasList.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
           <p style={{ color: '#666', fontSize: '1.1rem' }}>No hay materias registradas</p>
           <p style={{ color: '#999', marginTop: '0.5rem' }}>Haz clic en "Agregar Materia" para comenzar</p>
         </div>
       ) : (
-        <div className="estudiantes-grid">
-          {lista.map((a) => (
+        <div className="asignaturas-grid">
+          {asignaturasList.map((a) => (
             <div
               key={a.id}
-              className="estudiante-card"
+              className="asignatura-card"
               style={{ cursor: "pointer", position: "relative" }}
             >
               <div className="card-header">

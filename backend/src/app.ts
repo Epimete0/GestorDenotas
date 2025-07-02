@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { prisma } from "./config/prisma";
+import { formatErrorResponse, AppErrorClass } from "./config/errors";
 
 // Importa TODOS tus controllers:
 import courseController from "./controllers/courseController";
@@ -14,7 +15,6 @@ import profesorController from "./controllers/profesorController";
 import asistenciaController from "./controllers/asistenciaController";
 import authRoutes from "./routes/authRoutes";
 import observacionController from "./controllers/observacionController";
-import { updateEstudiante } from "./services/estudianteService";
 
 dotenv.config();
 
@@ -60,24 +60,22 @@ app.use("/api/asistencias", asistenciaController);
 app.use("/api/summary", summaryController);
 app.use("/api/observaciones", observacionController);
 
-// Manejador de errores
+// Manejador de errores mejorado
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("💥 Error en el servidor:", err);
   
-  // En desarrollo, mostrar más detalles del error
-  if (process.env.NODE_ENV === 'development') {
-    res.status(500).json({ 
-      error: "Internal server error",
-      message: err.message,
-      stack: err.stack
-    });
-  } else {
-  res.status(500).json({ error: "Internal server error" });
-  }
+  const errorResponse = formatErrorResponse(err);
+  const statusCode = err instanceof AppErrorClass ? err.statusCode : 500;
+  
+  res.status(statusCode).json(errorResponse);
 });
 
-// Arranque del servidor
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
-});
+// Arranque del servidor solo si no es importado (para testing)
+if (require.main === module) {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
+  });
+}
+
+export default app;

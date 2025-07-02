@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
@@ -40,13 +40,17 @@ export default function Login() {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         if (user.role === 'profesor') {
           navigate('/dashboard-profesor');
+        } else if (user.role === 'estudiante') {
+          navigate('/dashboard-estudiante');
+        } else if (user.role === 'admin') {
+          navigate('/admin');
         } else {
           navigate('/');
         }
       } else {
         setError("Credenciales incorrectas. Revisa las credenciales de demostración.");
       }
-    } catch (err) {
+    } catch {
       setError("Error al iniciar sesión. Intenta de nuevo.");
     } finally {
       setIsLoading(false);
@@ -124,10 +128,17 @@ export default function Login() {
             Contraseña: 123456<br />
             <br />
             <strong>Profesores:</strong><br />
-            Email: profesor1@demo.com<br />
+            Email: sofia.ramirez@demo.com<br />
             Contraseña: 123456<br />
             <br />
-            Email: profesor2@demo.com<br />
+            Email: carlos.munoz@demo.com<br />
+            Contraseña: 123456<br />
+            <br />
+            <strong>Estudiantes:</strong><br />
+            Email: martina.gomez@estudiante.com<br />
+            Contraseña: 123456<br />
+            <br />
+            Email: lucas.soto@estudiante.com<br />
             Contraseña: 123456
           </p>
         </div>

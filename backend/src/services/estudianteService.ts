@@ -1,16 +1,28 @@
 // backend/src/services/estudianteService.ts
 import { estudianteRepository } from "../repositories/estudianteRepository";
+import { createError } from "../config/errors";
 
 export async function getAllEstudiantes() {
-  return estudianteRepository.findAll();
+  try {
+    return await estudianteRepository.findAll();
+  } catch (error) {
+    throw createError.internal('Error al obtener estudiantes');
+  }
 }
 
 export async function getEstudianteById(id: number) {
-  const estudiante = await estudianteRepository.findById(id);
-  if (!estudiante) {
-    throw new Error("Estudiante no encontrado");
+  try {
+    const estudiante = await estudianteRepository.findById(id);
+    if (!estudiante) {
+      throw createError.notFound('Estudiante no encontrado');
+    }
+    return estudiante;
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Estudiante no encontrado') {
+      throw error;
+    }
+    throw createError.internal('Error al obtener estudiante');
   }
-  return estudiante;
 }
 
 export async function createEstudiante(data: {
@@ -22,19 +34,23 @@ export async function createEstudiante(data: {
 }) {
   // Validaciones básicas
   if (!data.nombre || !data.apellido) {
-    throw new Error("Nombre y apellido son requeridos");
+    throw createError.validation('Nombre y apellido son requeridos');
   }
   if (data.edad < 3 || data.edad > 25) {
-    throw new Error("La edad debe estar entre 3 y 25 años");
+    throw createError.validation('La edad debe estar entre 3 y 25 años');
   }
   if (!["M", "F"].includes(data.sexo)) {
-    throw new Error("El sexo debe ser 'M' o 'F'");
+    throw createError.validation('El sexo debe ser "M" o "F"');
   }
   if (data.cursoId <= 0) {
-    throw new Error("ID de curso inválido");
+    throw createError.validation('ID de curso inválido');
   }
 
-  return estudianteRepository.create(data);
+  try {
+    return await estudianteRepository.create(data);
+  } catch (error) {
+    throw createError.internal('Error al crear estudiante');
+  }
 }
 
 export async function updateEstudiante(
@@ -47,23 +63,43 @@ export async function updateEstudiante(
     cursoId?: number;
   }
 ) {
-  // Verificar que el estudiante existe
-  await getEstudianteById(id);
+  try {
+    // Verificar que el estudiante existe
+    await getEstudianteById(id);
 
-  // Validaciones básicas
-  if (data.edad && (data.edad < 3 || data.edad > 25)) {
-    throw new Error("La edad debe estar entre 3 y 25 años");
-  }
-  if (data.sexo && !["M", "F"].includes(data.sexo)) {
-    throw new Error("El sexo debe ser 'M' o 'F'");
-  }
+    // Validaciones básicas
+    if (data.edad && (data.edad < 3 || data.edad > 25)) {
+      throw createError.validation('La edad debe estar entre 3 y 25 años');
+    }
+    if (data.sexo && !["M", "F"].includes(data.sexo)) {
+      throw createError.validation('El sexo debe ser "M" o "F"');
+    }
 
-  return estudianteRepository.update(id, data);
+    return await estudianteRepository.update(id, data);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Estudiante no encontrado')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('La edad debe estar')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('El sexo debe ser')) {
+      throw error;
+    }
+    throw createError.internal('Error al actualizar estudiante');
+  }
 }
 
 export async function deleteEstudiante(id: number) {
-  // Verificar que el estudiante existe
-  await getEstudianteById(id);
+  try {
+    // Verificar que el estudiante existe
+    await getEstudianteById(id);
 
-  return estudianteRepository.delete(id);
+    return await estudianteRepository.delete(id);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Estudiante no encontrado')) {
+      throw error;
+    }
+    throw createError.internal('Error al eliminar estudiante');
+  }
 }

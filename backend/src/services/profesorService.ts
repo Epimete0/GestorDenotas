@@ -1,15 +1,27 @@
 import { profesorRepository } from "../repositories/profesorRepository";
+import { createError } from "../config/errors";
 
 export async function getAllProfesores() {
-  return profesorRepository.findAll();
+  try {
+    return await profesorRepository.findAll();
+  } catch (error) {
+    throw createError.internal('Error al obtener profesores');
+  }
 }
 
 export async function getProfesorById(id: number) {
-  const profesor = await profesorRepository.findById(id);
-  if (!profesor) {
-    throw new Error("Profesor no encontrado");
+  try {
+    const profesor = await profesorRepository.findById(id);
+    if (!profesor) {
+      throw createError.notFound('Profesor no encontrado');
+    }
+    return profesor;
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Profesor no encontrado') {
+      throw error;
+    }
+    throw createError.internal('Error al obtener profesor');
   }
-  return profesor;
 }
 
 export async function createProfesor(data: {
@@ -20,16 +32,20 @@ export async function createProfesor(data: {
 }) {
   // Validaciones básicas
   if (!data.nombre || !data.apellido) {
-    throw new Error("Nombre y apellido son requeridos");
+    throw createError.validation('Nombre y apellido son requeridos');
   }
   if (data.edad < 18 || data.edad > 80) {
-    throw new Error("La edad debe estar entre 18 y 80 años");
+    throw createError.validation('La edad debe estar entre 18 y 80 años');
   }
   if (!["M", "F"].includes(data.sexo)) {
-    throw new Error("El sexo debe ser 'M' o 'F'");
+    throw createError.validation('El sexo debe ser "M" o "F"');
   }
 
-  return profesorRepository.create(data);
+  try {
+    return await profesorRepository.create(data);
+  } catch (error) {
+    throw createError.internal('Error al crear profesor');
+  }
 }
 
 export async function updateProfesor(
@@ -41,37 +57,71 @@ export async function updateProfesor(
     sexo?: string;
   }
 ) {
-  // Verificar que el profesor existe
-  await getProfesorById(id);
+  try {
+    // Verificar que el profesor existe
+    await getProfesorById(id);
 
-  // Validaciones básicas
-  if (data.edad && (data.edad < 18 || data.edad > 80)) {
-    throw new Error("La edad debe estar entre 18 y 80 años");
-  }
-  if (data.sexo && !["M", "F"].includes(data.sexo)) {
-    throw new Error("El sexo debe ser 'M' o 'F'");
-  }
+    // Validaciones básicas
+    if (data.edad && (data.edad < 18 || data.edad > 80)) {
+      throw createError.validation('La edad debe estar entre 18 y 80 años');
+    }
+    if (data.sexo && !["M", "F"].includes(data.sexo)) {
+      throw createError.validation('El sexo debe ser "M" o "F"');
+    }
 
-  return profesorRepository.update(id, data);
+    return await profesorRepository.update(id, data);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Profesor no encontrado')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('La edad debe estar')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('El sexo debe ser')) {
+      throw error;
+    }
+    throw createError.internal('Error al actualizar profesor');
+  }
 }
 
 export async function deleteProfesor(id: number) {
-  // Verificar que el profesor existe
-  await getProfesorById(id);
+  try {
+    // Verificar que el profesor existe
+    await getProfesorById(id);
 
-  return profesorRepository.delete(id);
+    return await profesorRepository.delete(id);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Profesor no encontrado')) {
+      throw error;
+    }
+    throw createError.internal('Error al eliminar profesor');
+  }
 }
 
 export async function addAsignaturaToProfesor(profesorId: number, asignaturaId: number) {
-  // Verificar que el profesor existe
-  await getProfesorById(profesorId);
+  try {
+    // Verificar que el profesor existe
+    await getProfesorById(profesorId);
 
-  return profesorRepository.addAsignatura(profesorId, asignaturaId);
+    return await profesorRepository.addAsignatura(profesorId, asignaturaId);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Profesor no encontrado')) {
+      throw error;
+    }
+    throw createError.internal('Error al agregar asignatura al profesor');
+  }
 }
 
 export async function removeAsignaturaFromProfesor(profesorId: number, asignaturaId: number) {
-  // Verificar que el profesor existe
-  await getProfesorById(profesorId);
+  try {
+    // Verificar que el profesor existe
+    await getProfesorById(profesorId);
 
-  return profesorRepository.removeAsignatura(profesorId, asignaturaId);
+    return await profesorRepository.removeAsignatura(profesorId, asignaturaId);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Profesor no encontrado')) {
+      throw error;
+    }
+    throw createError.internal('Error al remover asignatura del profesor');
+  }
 } 

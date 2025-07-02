@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { API_BASE } from "../services/api";
 import "./Resumen.css";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -23,20 +24,37 @@ export default function Resumen() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Para cuando exista un endpoint real /api/summary
-    fetch("http://localhost:4000/api/summary")
-      .then((res) => {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
-      })
-      .then((json) => setData(json as Summary))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    const fetchSummaryData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const res = await fetch(`${API_BASE}/api/summary`);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const json = await res.json();
+        
+        if (json.success) {
+          setData(json.data);
+        } else {
+          throw new Error(json.message || 'Error al cargar datos del resumen');
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Error desconocido');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummaryData();
   }, []);
 
   if (loading) return <p className="text-center">Cargando resumen…</p>;
   if (error) return <p className="text-center error">Error: {error}</p>;
-  if (!data) return null;
+  if (!data) return <p className="text-center">No se pudieron cargar los datos del resumen.</p>;
 
   const {
     totalEstudiantes,
@@ -64,13 +82,19 @@ export default function Resumen() {
     doc.setFontSize(13);
     doc.text("Top 5 Asignaturas por Promedio", 14, y);
     y += 3;
-    doc.autoTable({
-      startY: y,
-      head: [["Asignatura", "Promedio"]],
-      body: data.topAsignaturas.map((a) => [a.nombre, a.promedio.toFixed(2)]),
-      theme: 'grid',
-      styles: { fontSize: 10 },
-    });
+    
+    if (data.topAsignaturas && data.topAsignaturas.length > 0) {
+      doc.autoTable({
+        startY: y,
+        head: [["Asignatura", "Promedio"]],
+        body: data.topAsignaturas.map((a) => [a.nombre, a.promedio.toFixed(2)]),
+        theme: 'grid',
+        styles: { fontSize: 10 },
+      });
+    } else {
+      doc.text("No hay datos de asignaturas disponibles", 14, y);
+    }
+    
     doc.save("resumen_academico.pdf");
   }
 
@@ -78,19 +102,45 @@ export default function Resumen() {
     const ws = XLSX.utils.json_to_sheet([
       { Estudiantes: data.totalEstudiantes, Cursos: data.totalCursos, "Promedio General": data.promedioGeneral, "Tasa de Asistencia": data.tasaAsistencia }
     ]);
-    const ws2 = XLSX.utils.json_to_sheet(
-      data.topAsignaturas.map((a) => ({ Asignatura: a.nombre, Promedio: a.promedio }))
-    );
+    
+    let ws2;
+    if (data.topAsignaturas && data.topAsignaturas.length > 0) {
+      ws2 = XLSX.utils.json_to_sheet(
+        data.topAsignaturas.map((a) => ({ Asignatura: a.nombre, Promedio: a.promedio }))
+      );
+    } else {
+      ws2 = XLSX.utils.json_to_sheet([{ Asignatura: "No hay datos disponibles", Promedio: "" }]);
+    }
+    
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Resumen");
     XLSX.utils.book_append_sheet(wb, ws2, "Top Asignaturas");
     XLSX.writeFile(wb, "resumen_academico.xlsx");
   }
 
+  const handleManualTest = () => {
+    fetch(`${API_BASE}/api/summary`)
+      .then(res => res.json())
+      .then(() => {
+        // Procesar datos si es necesario
+      })
+      .catch(error => {
+        console.error('Error en test manual:', error);
+      });
+  };
+
   return (
     <div className="resumen-page">
       <h2 className="page-title">Resumen Académico</h2>
+      
+      {/* Botón de prueba para debug */}
       <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+        <button 
+          className="btn-minimal" 
+          onClick={handleManualTest}
+        >
+          🔍 Probar Conexión
+        </button>
         <button className="btn-minimal" onClick={() => exportarResumenPDF(data)}>
           Exportar a PDF
         </button>
@@ -120,14 +170,18 @@ export default function Resumen() {
 
       <section className="list-section">
         <h3>Top 5 Asignaturas por Promedio</h3>
-        <ul>
-          {topAsignaturas.map((a, i) => (
-            <li key={i}>
-              <span>{a.nombre}</span>
-              <span>{a.promedio.toFixed(2)}</span>
-            </li>
-          ))}
-        </ul>
+        {topAsignaturas && topAsignaturas.length > 0 ? (
+          <ul>
+            {topAsignaturas.map((a, i) => (
+              <li key={i}>
+                <span>{a.nombre}</span>
+                <span>{a.promedio.toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-center">No hay datos de asignaturas disponibles.</p>
+        )}
       </section>
     </div>
   );

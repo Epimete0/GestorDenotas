@@ -1,6 +1,5 @@
 // frontend/src/App.tsx
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
@@ -20,6 +19,7 @@ import CursosProfesor from "./pages/CursosProfesor";
 import ObservacionesProfesor from "./pages/ObservacionesProfesor";
 import AsistenciaProfesor from "./pages/AsistenciaProfesor";
 import CalificacionesProfesor from "./pages/CalificacionesProfesor";
+import DashboardEstudiantes from "./pages/DashboardEstudiantes";
 
 function NoAutorizado() {
   return (
@@ -46,13 +46,68 @@ function ProfesorRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function EstudianteRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role !== 'estudiante') {
+    return <NoAutorizado />;
+  }
+  return <>{children}</>;
+}
+
+// Componente para redirigir según el rol del usuario
+function HomeRoute() {
+  const { user } = useAuth();
+  if (user?.role === 'profesor') {
+    return <Navigate to="/dashboard-profesor" replace />;
+  } else if (user?.role === 'estudiante') {
+    return <Navigate to="/dashboard-estudiante" replace />;
+  } else if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  } else {
+    return <Login />;
+  }
+}
+
+// NUEVO: Componente para decidir qué mostrar en /login
+function LoginRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <HomeRoute /> : <Login />;
+}
+
+// NUEVO: Componente para decidir qué mostrar en la raíz
+function RootRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <HomeRoute /> : <Login />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          {/* Ruta pública para login */}
-          <Route path="/login" element={<Login />} />
+          {/* Ruta raíz que muestra login o redirige según sesión/rol */}
+          <Route path="/" element={<RootRoute />} />
+          {/* Ruta /login que redirige si ya hay sesión */}
+          <Route path="/login" element={<LoginRoute />} />
+          
+          {/* Ruta principal para admin y sus subrutas */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <Layout />
+              </AdminRoute>
+            </ProtectedRoute>
+          }>
+            <Route index element={<Dashboard />} />
+            <Route path="courses" element={<Cursos />} />
+            <Route path="calificaciones" element={<Calificaciones />} />
+            <Route path="asistencia" element={<Asistencia />} />
+            <Route path="resumen" element={<Resumen />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="estudiantes" element={<Estudiantes />} />
+            <Route path="profesores" element={<Profesores />} />
+            <Route path="asignaturas" element={<Asignaturas />} />
+          </Route>
           
           {/* Ruta exclusiva para profesores, con layout propio y rutas hijas */}
           <Route path="/dashboard-profesor/*" element={
@@ -67,36 +122,17 @@ export default function App() {
             <Route path="asistencia" element={<AsistenciaProfesor />} />
           </Route>
           
-          {/* Rutas protegidas */}
-          <Route path="/*" element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }>
-            {/* Dashboard en "/" */}
-            <Route index element={<Dashboard />} />
-
-            {/* Solo admin */}
-            <Route path="courses" element={
-              <AdminRoute>
-                <Cursos />
-              </AdminRoute>
-            } />
-
-            {/* Acceso común */}
-            <Route path="calificaciones" element={<Calificaciones />} />
-            <Route path="asistencia" element={<Asistencia />} />
-            <Route path="resumen" element={<Resumen />} />
-            <Route path="calendar" element={<Calendar />} />
-            <Route path="estudiantes" element={<Estudiantes />} />
-            <Route path="profesores" element={<Profesores />} />
-            <Route path="asignaturas" element={<Asignaturas />} />
-          </Route>
-
+          {/* Ruta exclusiva para estudiantes */}
+          <Route path="/dashboard-estudiante" element={
+            <EstudianteRoute>
+              <DashboardEstudiantes />
+            </EstudianteRoute>
+          } />
+          
           {/* Redirigir cualquier otra ruta a login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
 }

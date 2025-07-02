@@ -16,7 +16,10 @@ const router = Router();
 router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const asistencias = await getAllAsistencias();
-    res.json({ asistencias });
+    res.json({ 
+      success: true,
+      data: { asistencias } 
+    });
   } catch (err) {
     next(err);
   }
@@ -37,7 +40,10 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     const asistencia = await getAsistenciaById(id);
-    res.json({ asistencia });
+    res.json({ 
+      success: true,
+      data: { asistencia } 
+    });
   } catch (err) {
     next(err);
   }
@@ -48,7 +54,10 @@ router.get("/estudiante/:estudianteId", async (req: Request, res: Response, next
   try {
     const estudianteId = Number(req.params.estudianteId);
     const asistencias = await getAsistenciasByEstudiante(estudianteId);
-    res.json({ asistencias });
+    res.json({ 
+      success: true,
+      data: { asistencias } 
+    });
   } catch (err) {
     next(err);
   }
@@ -59,7 +68,10 @@ router.get("/fecha/:fecha", async (req: Request, res: Response, next: NextFuncti
   try {
     const fecha = new Date(req.params.fecha);
     const asistencias = await getAsistenciasByFecha(fecha);
-    res.json({ asistencias });
+    res.json({ 
+      success: true,
+      data: { asistencias } 
+    });
   } catch (err) {
     next(err);
   }
@@ -74,7 +86,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       fecha: new Date(fecha),
       estado,
     });
-    res.status(201).json({ asistencia: nuevaAsistencia });
+    res.status(201).json({ 
+      success: true,
+      data: { asistencia: nuevaAsistencia } 
+    });
   } catch (err) {
     next(err);
   }
@@ -89,7 +104,10 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
       fecha: fecha ? new Date(fecha) : undefined,
       estado,
     });
-    res.json({ asistencia: asistenciaActualizada });
+    res.json({ 
+      success: true,
+      data: { asistencia: asistenciaActualizada } 
+    });
   } catch (err) {
     next(err);
   }

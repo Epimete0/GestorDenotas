@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getStudents, createAsistencia, getAsistenciasByEstudiante } from "../services/api";
 import type { Student, Asistencia } from "../services/api";
 import "./Asistencia.css";
@@ -66,8 +66,8 @@ export default function Asistencia() {
         text: `Asistencia marcada: ${status} el ${date}`,
         type: "success",
       });
-    } catch (err: any) {
-      setMsg({ text: `Error: ${err.message}`, type: "error" });
+    } catch (err: unknown) {
+      setMsg({ text: `Error: ${err instanceof Error ? err.message : "Error al crear asistencia"}`, type: "error" });
     } finally {
       setFormLoading(false);
     }
@@ -109,6 +109,10 @@ export default function Asistencia() {
     XLSX.writeFile(wb, `asistencias${estudiante ? `_${estudiante.nombre}_${estudiante.apellido}` : ''}.xlsx`);
   }
 
+  // Seguridad: siempre usar un array
+  const studentsList = Array.isArray(students) ? students : [];
+  const asistenciasList = Array.isArray(asistencias) ? asistencias : [];
+
   return (
     <div className="asistencia-page">
       <h2 className="page-title">Asistencia</h2>
@@ -131,7 +135,7 @@ export default function Asistencia() {
                 className="select-minimal"
               >
                 <option value="">-- Selecciona --</option>
-                {students.map((s) => (
+                {studentsList.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.nombre} {s.apellido}
                   </option>
@@ -160,7 +164,7 @@ export default function Asistencia() {
                       name="status"
                       value={opt}
                       checked={status === opt}
-                      onChange={() => setStatus(opt as any)}
+                      onChange={() => setStatus(opt as "presente" | "ausente" | "tarde")}
                     />
                     {opt.charAt(0).toUpperCase() + opt.slice(1)}
                   </label>
@@ -185,10 +189,10 @@ export default function Asistencia() {
           <div className="historial-card card">
             <h3>Historial de Asistencia</h3>
             <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-              <button onClick={() => exportarAsistenciasPDF(asistencias, students.find(s => s.id === selectedStudent))} disabled={asistencias.length === 0} className="btn-minimal">
+              <button onClick={() => exportarAsistenciasPDF(asistenciasList, studentsList.find(s => s.id === selectedStudent))} disabled={asistenciasList.length === 0} className="btn-minimal">
                 Exportar a PDF
               </button>
-              <button onClick={() => exportarAsistenciasExcel(asistencias, students.find(s => s.id === selectedStudent))} disabled={asistencias.length === 0} className="btn-minimal">
+              <button onClick={() => exportarAsistenciasExcel(asistenciasList, studentsList.find(s => s.id === selectedStudent))} disabled={asistenciasList.length === 0} className="btn-minimal">
                 Exportar a Excel
               </button>
             </div>
@@ -196,17 +200,13 @@ export default function Asistencia() {
               <p>Cargando historial...</p>
             ) : (
               <div className="asistencias-list">
-                {asistencias.length === 0 ? (
+                {asistenciasList.length === 0 ? (
                   <p>No hay registros de asistencia</p>
                 ) : (
-                  asistencias.map((a) => (
+                  asistenciasList.map((a) => (
                     <div key={a.id} className="asistencia-item">
-                      <span className="fecha">
-                        {new Date(a.fecha).toLocaleDateString()}
-                      </span>
-                      <span className={`estado ${a.estado}`}>
-                        {a.estado.charAt(0).toUpperCase() + a.estado.slice(1)}
-                      </span>
+                      <span>{new Date(a.fecha).toLocaleDateString()}</span>
+                      <span className={`estado ${a.estado}`}>{a.estado.charAt(0).toUpperCase() + a.estado.slice(1)}</span>
                     </div>
                   ))
                 )}

@@ -106,4 +106,22 @@ export const courseRepository = {
         },
       },
     }),
+
+  findByEstudiante: (estudianteId: number) =>
+    prisma.curso.findMany({
+      where: {
+        estudiantes: {
+          some: { id: estudianteId },
+        },
+      },
+      include: {
+        jefeDeCurso: true,
+        estudiantes: true,
+        planDeEstudio: {
+          include: {
+            asignatura: true,
+          },
+        },
+      },
+    }),
 };

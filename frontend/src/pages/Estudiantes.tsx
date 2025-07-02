@@ -1,5 +1,5 @@
 // frontend/src/pages/Estudiantes.tsx
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getStudents, getCourses, createStudent, updateStudent, deleteStudent, getProfesores } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -37,7 +37,7 @@ interface Estudiante {
 
 declare module "jspdf" {
   interface jsPDF {
-    autoTable: (...args: any[]) => void;
+    autoTable: (...args: unknown[]) => void;
     lastAutoTable: { finalY: number };
   }
 }
@@ -95,8 +95,8 @@ function ObservacionesCRUD({ estudianteId }: { estudianteId: number }) {
       setNuevoEstado("neutro");
       if (user?.role === 'admin') setProfesorIdAdmin(null);
       cargar();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setSaving(false);
     }
@@ -118,8 +118,8 @@ function ObservacionesCRUD({ estudianteId }: { estudianteId: number }) {
       setEditTexto("");
       setEditEstado("neutro");
       cargar();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setSaving(false);
     }
@@ -131,8 +131,8 @@ function ObservacionesCRUD({ estudianteId }: { estudianteId: number }) {
     try {
       await deleteObservacion(id);
       cargar();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setSaving(false);
     }
@@ -159,7 +159,7 @@ function ObservacionesCRUD({ estudianteId }: { estudianteId: number }) {
                       required
                       className="input-minimal"
                     />
-                    <select value={editEstado} onChange={e => setEditEstado(e.target.value as any)} className="select-minimal" style={{ flex: 1, minWidth: 90, padding: '0.5rem', borderRadius: 6, border: '1px solid var(--border-light)', fontSize: '1rem' }}>
+                    <select value={editEstado} onChange={e => setEditEstado(e.target.value as "negativa" | "neutro" | "positiva")} className="select-minimal" style={{ flex: 1, minWidth: 90, padding: '0.5rem', borderRadius: 6, border: '1px solid var(--border-light)', fontSize: '1rem' }}>
                       <option value="negativa">Negativa</option>
                       <option value="neutro">Neutro</option>
                       <option value="positiva">Positiva</option>
@@ -208,7 +208,7 @@ function ObservacionesCRUD({ estudianteId }: { estudianteId: number }) {
             ))}
           </select>
         )}
-        <select value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value as any)} disabled={saving} className="select-minimal" style={{ flex: 1, minWidth: 90, padding: '0.5rem', borderRadius: 6, border: '1px solid var(--border-light)', fontSize: '1rem' }}>
+        <select value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value as "negativa" | "neutro" | "positiva")} disabled={saving} className="select-minimal" style={{ flex: 1, minWidth: 90, padding: '0.5rem', borderRadius: 6, border: '1px solid var(--border-light)', fontSize: '1rem' }}>
           <option value="negativa">Negativa</option>
           <option value="neutro">Neutro</option>
           <option value="positiva">Positiva</option>
@@ -222,7 +222,6 @@ function ObservacionesCRUD({ estudianteId }: { estudianteId: number }) {
 
 function exportarFichaPDF(estudiante: Estudiante, observaciones: Observacion[]) {
   try {
-    console.log('Exportando ficha PDF', { estudiante, observaciones });
     const doc = new jsPDF();
     let y = 14;
     doc.setFontSize(16);
@@ -458,8 +457,8 @@ function CrearEstudianteModal({ onClose, onEstudianteCreado }: { onClose: () => 
 
       onEstudianteCreado();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
@@ -626,7 +625,7 @@ function EditarEstudianteModal({
     sexo: estudiante.sexo,
     cursoId: estudiante.curso?.id?.toString() || ""
   });
-  const [cursos, setCursos] = useState<any[]>([]);
+  const [cursos, setCursos] = useState<Curso[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -636,8 +635,8 @@ function EditarEstudianteModal({
       try {
         const cursosData = await getCourses();
         setCursos(cursosData);
-      } catch (err: any) {
-        setError("Error al cargar cursos: " + err.message);
+      } catch (err: unknown) {
+        setError("Error al cargar cursos: " + (err instanceof Error ? err.message : 'Error desconocido'));
       }
     };
     cargarCursos();
@@ -689,8 +688,8 @@ function EditarEstudianteModal({
 
       onEstudianteEditado();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
@@ -928,46 +927,52 @@ export default function Estudiantes() {
   const [mostrarCrearModal, setMostrarCrearModal] = useState(false);
   const [estudianteAEditar, setEstudianteAEditar] = useState<Estudiante | null>(null);
   const [estudianteAEliminar, setEstudianteAEliminar] = useState<Estudiante | null>(null);
-  const [eliminando, setEliminando] = useState(false);
+
   const [mostrarObsModal, setMostrarObsModal] = useState(false);
   const [busquedaObs, setBusquedaObs] = useState("");
   const [estudianteObsId, setEstudianteObsId] = useState<number | null>(null);
 
   const cargarEstudiantes = () => {
+    console.log('🔄 Iniciando carga de estudiantes...');
     setCargando(true);
     getStudents()
       .then((data) => {
+        console.log('✅ Datos recibidos:', data);
         // Map Student[] to Estudiante[] if needed
         setLista(
-          data.map((s: any) => ({
+          data.map((s) => ({
             id: s.id,
             nombre: s.nombre,
             apellido: s.apellido,
-            curso: s.curso,
+            curso: s.curso || { id: 0, nombre: 'Sin curso' },
             edad: s.edad,
             sexo: s.sexo,
-            calificaciones: s.calificaciones,
+            calificaciones: s.calificaciones || [],
             observaciones: s.observaciones ?? [],
             asistencias: s.asistencias ?? [],
           }))
         );
+        console.log('✅ Lista actualizada con', data.length, 'estudiantes');
       })
-      .catch((e) => setErr(e.message))
-      .finally(() => setCargando(false));
+      .catch((e) => {
+        console.error('❌ Error al cargar estudiantes:', e);
+        setErr(e.message);
+      })
+      .finally(() => {
+        console.log('🏁 Finalizando carga de estudiantes');
+        setCargando(false);
+      });
   };
 
   const handleEliminarEstudiante = async () => {
     if (!estudianteAEliminar) return;
     
-    setEliminando(true);
     try {
       await deleteStudent(estudianteAEliminar.id);
       cargarEstudiantes();
       setEstudianteAEliminar(null);
-    } catch (err: any) {
-      alert("Error al eliminar estudiante: " + err.message);
-    } finally {
-      setEliminando(false);
+    } catch (err: unknown) {
+      alert("Error al eliminar estudiante: " + (err instanceof Error ? err.message : 'Error desconocido'));
     }
   };
 

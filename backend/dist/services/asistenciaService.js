@@ -18,86 +18,145 @@ exports.updateAsistencia = updateAsistencia;
 exports.deleteAsistencia = deleteAsistencia;
 exports.getEstadisticasAsistencia = getEstadisticasAsistencia;
 const asistenciaRepository_1 = require("../repositories/asistenciaRepository");
+const errors_1 = require("../config/errors");
 function getAllAsistencias() {
     return __awaiter(this, void 0, void 0, function* () {
-        return asistenciaRepository_1.asistenciaRepository.findAll();
+        try {
+            return yield asistenciaRepository_1.asistenciaRepository.findAll();
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener asistencias');
+        }
     });
 }
 function getAsistenciaById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const asistencia = yield asistenciaRepository_1.asistenciaRepository.findById(id);
-        if (!asistencia) {
-            throw new Error("Asistencia no encontrada");
+        try {
+            const asistencia = yield asistenciaRepository_1.asistenciaRepository.findById(id);
+            if (!asistencia) {
+                throw errors_1.createError.notFound('Asistencia no encontrada');
+            }
+            return asistencia;
         }
-        return asistencia;
+        catch (error) {
+            if (error instanceof Error && error.message === 'Asistencia no encontrada') {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al obtener asistencia');
+        }
     });
 }
 function getAsistenciasByEstudiante(estudianteId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return asistenciaRepository_1.asistenciaRepository.findByEstudiante(estudianteId);
+        try {
+            return yield asistenciaRepository_1.asistenciaRepository.findByEstudiante(estudianteId);
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener asistencias por estudiante');
+        }
     });
 }
 function getAsistenciasByFecha(fecha) {
     return __awaiter(this, void 0, void 0, function* () {
-        return asistenciaRepository_1.asistenciaRepository.findByFecha(fecha);
+        try {
+            return yield asistenciaRepository_1.asistenciaRepository.findByFecha(fecha);
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener asistencias por fecha');
+        }
     });
 }
 function createAsistencia(data) {
     return __awaiter(this, void 0, void 0, function* () {
         // Validaciones básicas
         if (data.estudianteId <= 0) {
-            throw new Error("ID de estudiante inválido");
+            throw errors_1.createError.validation('ID de estudiante inválido');
         }
         if (!["presente", "ausente", "tarde"].includes(data.estado)) {
-            throw new Error("Estado de asistencia inválido");
+            throw errors_1.createError.validation('Estado de asistencia inválido');
         }
         if (data.fecha > new Date()) {
-            throw new Error("No se puede registrar asistencia para fechas futuras");
+            throw errors_1.createError.validation('No se puede registrar asistencia para fechas futuras');
         }
-        // Verificar si ya existe asistencia para este estudiante en esta fecha
-        const existingAsistencia = yield asistenciaRepository_1.asistenciaRepository.findByEstudianteAndFecha(data.estudianteId, data.fecha);
-        if (existingAsistencia) {
-            throw new Error("Ya existe un registro de asistencia para este estudiante en esta fecha");
+        try {
+            // Verificar si ya existe asistencia para este estudiante en esta fecha
+            const existingAsistencia = yield asistenciaRepository_1.asistenciaRepository.findByEstudianteAndFecha(data.estudianteId, data.fecha);
+            if (existingAsistencia) {
+                throw errors_1.createError.conflict('Ya existe un registro de asistencia para este estudiante en esta fecha');
+            }
+            return yield asistenciaRepository_1.asistenciaRepository.create(data);
         }
-        return asistenciaRepository_1.asistenciaRepository.create(data);
+        catch (error) {
+            if (error instanceof Error && error.message.includes('Ya existe un registro')) {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al crear asistencia');
+        }
     });
 }
 function updateAsistencia(id, data) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Verificar que la asistencia existe
-        yield getAsistenciaById(id);
-        // Validaciones básicas
-        if (data.estado && !["presente", "ausente", "tarde"].includes(data.estado)) {
-            throw new Error("Estado de asistencia inválido");
+        try {
+            // Verificar que la asistencia existe
+            yield getAsistenciaById(id);
+            // Validaciones básicas
+            if (data.estado && !["presente", "ausente", "tarde"].includes(data.estado)) {
+                throw errors_1.createError.validation('Estado de asistencia inválido');
+            }
+            if (data.fecha && data.fecha > new Date()) {
+                throw errors_1.createError.validation('No se puede registrar asistencia para fechas futuras');
+            }
+            return yield asistenciaRepository_1.asistenciaRepository.update(id, data);
         }
-        if (data.fecha && data.fecha > new Date()) {
-            throw new Error("No se puede registrar asistencia para fechas futuras");
+        catch (error) {
+            if (error instanceof Error && error.message.includes('Asistencia no encontrada')) {
+                throw error;
+            }
+            if (error instanceof Error && error.message.includes('Estado de asistencia inválido')) {
+                throw error;
+            }
+            if (error instanceof Error && error.message.includes('No se puede registrar asistencia')) {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al actualizar asistencia');
         }
-        return asistenciaRepository_1.asistenciaRepository.update(id, data);
     });
 }
 function deleteAsistencia(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Verificar que la asistencia existe
-        yield getAsistenciaById(id);
-        return asistenciaRepository_1.asistenciaRepository.delete(id);
+        try {
+            // Verificar que la asistencia existe
+            yield getAsistenciaById(id);
+            return yield asistenciaRepository_1.asistenciaRepository.delete(id);
+        }
+        catch (error) {
+            if (error instanceof Error && error.message.includes('Asistencia no encontrada')) {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al eliminar asistencia');
+        }
     });
 }
 function getEstadisticasAsistencia() {
     return __awaiter(this, void 0, void 0, function* () {
-        const asistencias = yield asistenciaRepository_1.asistenciaRepository.findAll();
-        const total = asistencias.length;
-        const presentes = asistencias.filter((a) => a.estado === "presente").length;
-        const ausentes = asistencias.filter((a) => a.estado === "ausente").length;
-        const tardes = asistencias.filter((a) => a.estado === "tarde").length;
-        return {
-            total,
-            presentes,
-            ausentes,
-            tardes,
-            porcentajePresentes: total > 0 ? (presentes / total) * 100 : 0,
-            porcentajeAusentes: total > 0 ? (ausentes / total) * 100 : 0,
-            porcentajeTardes: total > 0 ? (tardes / total) * 100 : 0,
-        };
+        try {
+            const asistencias = yield asistenciaRepository_1.asistenciaRepository.findAll();
+            const total = asistencias.length;
+            const presentes = asistencias.filter((a) => a.estado === "presente").length;
+            const ausentes = asistencias.filter((a) => a.estado === "ausente").length;
+            const tardes = asistencias.filter((a) => a.estado === "tarde").length;
+            return {
+                total,
+                presentes,
+                ausentes,
+                tardes,
+                porcentajePresentes: total > 0 ? (presentes / total) * 100 : 0,
+                porcentajeAusentes: total > 0 ? (ausentes / total) * 100 : 0,
+                porcentajeTardes: total > 0 ? (tardes / total) * 100 : 0,
+            };
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener estadísticas de asistencia');
+        }
     });
 }

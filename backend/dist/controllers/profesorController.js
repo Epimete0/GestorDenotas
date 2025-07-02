@@ -16,7 +16,10 @@ const router = (0, express_1.Router)();
 router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const profesores = yield (0, profesorService_1.getAllProfesores)();
-        res.json({ profesores });
+        res.json({
+            success: true,
+            data: { profesores }
+        });
     }
     catch (err) {
         next(err);
@@ -27,7 +30,10 @@ router.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     try {
         const id = Number(req.params.id);
         const profesor = yield (0, profesorService_1.getProfesorById)(id);
-        res.json({ profesor });
+        res.json({
+            success: true,
+            data: { profesor }
+        });
     }
     catch (err) {
         next(err);
@@ -43,7 +49,10 @@ router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             edad: Number(edad),
             sexo,
         });
-        res.status(201).json({ profesor: nuevoProfesor });
+        res.status(201).json({
+            success: true,
+            data: { profesor: nuevoProfesor }
+        });
     }
     catch (err) {
         next(err);
@@ -60,7 +69,10 @@ router.put("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             edad: edad ? Number(edad) : undefined,
             sexo,
         });
-        res.json({ profesor: profesorActualizado });
+        res.json({
+            success: true,
+            data: { profesor: profesorActualizado }
+        });
     }
     catch (err) {
         next(err);
@@ -77,19 +89,22 @@ router.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(err);
     }
 }));
-// POST /api/profesores/:id/asignaturas - Agregar asignatura al profesor
+// POST /api/profesores/:id/asignaturas - Agregar asignatura a profesor
 router.post("/:id/asignaturas", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const profesorId = Number(req.params.id);
         const { asignaturaId } = req.body;
-        yield (0, profesorService_1.addAsignaturaToProfesor)(profesorId, Number(asignaturaId));
-        res.status(201).json({ message: "Asignatura agregada al profesor" });
+        yield (0, profesorService_1.addAsignaturaToProfesor)(profesorId, asignaturaId);
+        res.status(201).json({
+            success: true,
+            data: { message: "Asignatura agregada al profesor" }
+        });
     }
     catch (err) {
         next(err);
     }
 }));
-// DELETE /api/profesores/:id/asignaturas/:asignaturaId - Remover asignatura del profesor
+// DELETE /api/profesores/:id/asignaturas/:asignaturaId - Remover asignatura de profesor
 router.delete("/:id/asignaturas/:asignaturaId", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const profesorId = Number(req.params.id);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { 
   getCursosByProfesor, 
@@ -31,6 +31,7 @@ const CalificacionesProfesor: React.FC = () => {
   // Estados de UI
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Cargar cursos del profesor al montar
   useEffect(() => {
@@ -46,7 +47,7 @@ const CalificacionesProfesor: React.FC = () => {
         setAsignaturas(asignaturasData);
       })
       .catch((error: Error) => {
-        setMessage({ text: "Error cargando datos: " + error.message, type: 'error' });
+        setError("Error cargando datos: " + error.message);
       })
       .finally(() => setLoading(false));
   }, [user]);
@@ -58,7 +59,7 @@ const CalificacionesProfesor: React.FC = () => {
       getEstudiantesByCurso(Number(selectedCourse))
         .then(setEstudiantes)
         .catch((error: Error) => {
-          setMessage({ text: "Error cargando estudiantes: " + error.message, type: 'error' });
+          setError("Error cargando estudiantes: " + error.message);
         })
         .finally(() => setLoading(false));
     } else {
@@ -73,9 +74,9 @@ const CalificacionesProfesor: React.FC = () => {
     setLoading(true);
     getGradesByProfesor(user.profesorId)
       .then(setCalificaciones)
-              .catch((error: Error) => {
-          setMessage({ text: "Error cargando calificaciones: " + error.message, type: 'error' });
-        })
+      .catch((error: Error) => {
+        setError("Error cargando calificaciones: " + error.message);
+      })
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -134,7 +135,7 @@ const CalificacionesProfesor: React.FC = () => {
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      setMessage({ text: "Error: " + errorMessage, type: 'error' });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -168,7 +169,7 @@ const CalificacionesProfesor: React.FC = () => {
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      setMessage({ text: "Error: " + errorMessage, type: 'error' });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -198,172 +199,190 @@ const CalificacionesProfesor: React.FC = () => {
         </div>
       </div>
 
-      <div className="calificaciones-content">
-        <div className="calificaciones-form-container">
-          <form onSubmit={handleSubmit} className="calificaciones-form">
-            {/* Selector de Curso */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-text">Curso</span>
-                <select
-                  className="form-select"
-                  value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
-                  required
-                >
-                  <option value="">Seleccionar Curso</option>
-                  {cursos.map((curso) => (
-                    <option key={curso.id} value={curso.id}>
-                      {curso.nombre}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            {/* Selector de Estudiante */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-text">Nombre del Estudiante</span>
-                <select
-                  className="form-select"
-                  value={selectedStudent}
-                  onChange={(e) => setSelectedStudent(e.target.value)}
-                  required
-                >
-                  <option value="">Seleccionar Estudiante</option>
-                  {estudiantes.map((estudiante) => (
-                    <option key={estudiante.id} value={estudiante.id}>
-                      {estudiante.nombre} {estudiante.apellido}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            {/* Selector de Materia */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-text">Materia</span>
-                <select
-                  className="form-select"
-                  value={selectedAssessmentType}
-                  onChange={(e) => setSelectedAssessmentType(e.target.value)}
-                  required
-                >
-                  <option value="">Seleccionar Materia</option>
-                  {asignaturas.map((asignatura) => (
-                    <option key={asignatura.id} value={asignatura.id}>
-                      {asignatura.nombre}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            {/* Campo de Calificación */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-text">Calificación</span>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="1.0"
-                  max="7.0"
-                  placeholder="Ingresar Calificación"
-                  className="form-input"
-                  value={grade}
-                  onChange={(e) => setGrade(e.target.value)}
-                  required
-                />
-              </label>
-            </div>
-
-            {/* Mensajes de estado */}
-            {message && (
-              <div className={`message ${message.type}`}>
-                {message.text}
-              </div>
-            )}
-
-            {/* Botones de acción */}
-            <div className="form-actions">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? "Guardando..." : editingGradeId ? "Actualizar Calificación" : "Guardar Calificación"}
-              </button>
-              
-              {editingGradeId && (
-                <>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={handleDeleteGrade}
-                    disabled={loading}
-                  >
-                    {loading ? "Eliminando..." : "Eliminar Calificación"}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleCancelEdit}
-                    disabled={loading}
-                  >
-                    Cancelar
-                  </button>
-                </>
-              )}
-            </div>
-          </form>
+      {loading ? (
+        <div className="calificaciones-content">
+          <p className="loading-text">Cargando datos...</p>
         </div>
-        <div className="calificaciones-list-container">
-          <div className="calificaciones-list">
-            <h3 className="list-title">Calificaciones Recientes</h3>
-            {loading ? (
-              <p className="loading-text">Cargando calificaciones...</p>
-            ) : calificaciones.length === 0 ? (
-              <p className="empty-text">No hay calificaciones registradas</p>
-            ) : (
-              <div className="grades-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Estudiante</th>
-                      <th>Curso</th>
-                      <th>Asignatura</th>
-                      <th>Calificación</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {calificaciones.slice(0, 5).map((calificacion) => (
-                      <tr key={calificacion.id}>
-                        <td>{calificacion.estudiante?.nombre} {calificacion.estudiante?.apellido}</td>
-                        <td>{calificacion.estudiante?.curso?.nombre}</td>
-                        <td>{calificacion.asignatura.nombre}</td>
-                        <td className={`grade-value ${calificacion.valor >= 4.0 ? 'passing' : 'failing'}`}>
-                          {calificacion.valor}
-                        </td>
-                        <td>
-                          <button
-                            className="btn-edit"
-                            onClick={() => handleEditGrade(calificacion)}
-                          >
-                            Editar
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+      ) : error ? (
+        <div className="calificaciones-content">
+          <p className="error-text">Error: {error}</p>
         </div>
-      </div>
+      ) : (
+        <div className="calificaciones-content">
+          {cursos && cursos.length === 0 ? (
+            <div className="empty-state">
+              <p className="empty-text">No tienes cursos asignados.</p>
+              <p className="empty-subtext">Contacta al administrador para que te asigne cursos.</p>
+            </div>
+          ) : (
+            <>
+              <div className="calificaciones-form-container">
+                <form onSubmit={handleSubmit} className="calificaciones-form">
+                  {/* Selector de Curso */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-text">Curso</span>
+                      <select
+                        className="form-select"
+                        value={selectedCourse}
+                        onChange={(e) => setSelectedCourse(e.target.value)}
+                        required
+                      >
+                        <option value="">Seleccionar Curso</option>
+                        {cursos && cursos.map((curso) => (
+                          <option key={curso.id} value={curso.id}>
+                            {curso.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  {/* Selector de Estudiante */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-text">Nombre del Estudiante</span>
+                      <select
+                        className="form-select"
+                        value={selectedStudent}
+                        onChange={(e) => setSelectedStudent(e.target.value)}
+                        required
+                        disabled={!selectedCourse}
+                      >
+                        <option value="">Seleccionar Estudiante</option>
+                        {estudiantes && estudiantes.map((estudiante) => (
+                          <option key={estudiante.id} value={estudiante.id}>
+                            {estudiante.nombre} {estudiante.apellido}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  {/* Selector de Materia */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-text">Materia</span>
+                      <select
+                        className="form-select"
+                        value={selectedAssessmentType}
+                        onChange={(e) => setSelectedAssessmentType(e.target.value)}
+                        required
+                      >
+                        <option value="">Seleccionar Materia</option>
+                        {asignaturas && asignaturas.map((asignatura) => (
+                          <option key={asignatura.id} value={asignatura.id}>
+                            {asignatura.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  {/* Campo de Calificación */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-text">Calificación</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="1.0"
+                        max="7.0"
+                        placeholder="Ingresar Calificación"
+                        className="form-input"
+                        value={grade}
+                        onChange={(e) => setGrade(e.target.value)}
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  {/* Mensajes de estado */}
+                  {message && (
+                    <div className={`message ${message.type}`}>
+                      {message.text}
+                    </div>
+                  )}
+
+                  {/* Botones de acción */}
+                  <div className="form-actions">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={loading}
+                    >
+                      {loading ? "Guardando..." : editingGradeId ? "Actualizar Calificación" : "Guardar Calificación"}
+                    </button>
+                    
+                    {editingGradeId && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          onClick={handleDeleteGrade}
+                          disabled={loading}
+                        >
+                          {loading ? "Eliminando..." : "Eliminar Calificación"}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={handleCancelEdit}
+                          disabled={loading}
+                        >
+                          Cancelar
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </form>
+              </div>
+              <div className="calificaciones-list-container">
+                <div className="calificaciones-list">
+                  <h3 className="list-title">Calificaciones Recientes</h3>
+                  {calificaciones && calificaciones.length === 0 ? (
+                    <p className="empty-text">No hay calificaciones registradas</p>
+                  ) : (
+                    <div className="grades-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Estudiante</th>
+                            <th>Curso</th>
+                            <th>Asignatura</th>
+                            <th>Calificación</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {calificaciones && calificaciones.slice(0, 5).map((calificacion) => (
+                            <tr key={calificacion.id}>
+                              <td>{calificacion.estudiante?.nombre} {calificacion.estudiante?.apellido}</td>
+                              <td>{calificacion.estudiante?.curso?.nombre}</td>
+                              <td>{calificacion.asignatura.nombre}</td>
+                              <td className={`grade-value ${calificacion.valor >= 4.0 ? 'passing' : 'failing'}`}>
+                                {calificacion.valor}
+                              </td>
+                              <td>
+                                <button
+                                  className="btn-edit"
+                                  onClick={() => handleEditGrade(calificacion)}
+                                >
+                                  Editar
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

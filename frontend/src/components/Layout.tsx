@@ -65,31 +65,31 @@ export default function Layout() {
         <nav className="menu">
           <h4>Menu Principal</h4>
           <ul>
-            <li className={isActive("/") ? "active" : ""}>
-              <Link to="/">Dashboard</Link>
+            <li className={isActive("/admin") ? "active" : ""}>
+              <Link to="/admin">Dashboard</Link>
             </li>
             {user?.role === 'admin' && (
-              <li className={isActive("/courses") ? "active" : ""}>
-                <Link to="/courses">Cursos</Link>
+              <li className={isActive("/admin/courses") ? "active" : ""}>
+                <Link to="/admin/courses">Cursos</Link>
               </li>
             )}
-            <li className={isActive("/estudiantes") ? "active" : ""}>
-              <Link to="/estudiantes">Estudiantes</Link>
+            <li className={isActive("/admin/estudiantes") ? "active" : ""}>
+              <Link to="/admin/estudiantes">Estudiantes</Link>
             </li>
-            <li className={isActive("/profesores") ? "active" : ""}>
-              <Link to="/profesores">Profesores</Link>
+            <li className={isActive("/admin/profesores") ? "active" : ""}>
+              <Link to="/admin/profesores">Profesores</Link>
             </li>
-            <li className={isActive("/asignaturas") ? "active" : ""}>
-              <Link to="/asignaturas">Materias</Link>
+            <li className={isActive("/admin/asignaturas") ? "active" : ""}>
+              <Link to="/admin/asignaturas">Materias</Link>
             </li>
-            <li className={isActive("/calificaciones") ? "active" : ""}>
-              <Link to="/calificaciones">Calificaciones</Link>
+            <li className={isActive("/admin/calificaciones") ? "active" : ""}>
+              <Link to="/admin/calificaciones">Calificaciones</Link>
             </li>
-            <li className={isActive("/asistencia") ? "active" : ""}>
-              <Link to="/asistencia">Asistencia</Link>
+            <li className={isActive("/admin/asistencia") ? "active" : ""}>
+              <Link to="/admin/asistencia">Asistencia</Link>
             </li>
-            <li className={isActive("/resumen") ? "active" : ""}>
-              <Link to="/resumen">Resumen</Link>
+            <li className={isActive("/admin/resumen") ? "active" : ""}>
+              <Link to="/admin/resumen">Resumen</Link>
             </li>
           </ul>
         </nav>
@@ -97,8 +97,8 @@ export default function Layout() {
         <nav className="menu others">
           <h4>Utiles</h4>
           <ul>
-            <li className={isActive("/calendar") ? "active" : ""}>
-              <Link to="/calendar">Calendario</Link>
+            <li className={isActive("/admin/calendar") ? "active" : ""}>
+              <Link to="/admin/calendar">Calendario</Link>
             </li>
           </ul>
         </nav>

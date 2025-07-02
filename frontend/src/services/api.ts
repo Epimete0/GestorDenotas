@@ -1,6 +1,6 @@
 // frontend/src/services/api.ts
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+export const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 
 // ——————————————
 //  Interfaces de datos
@@ -13,6 +13,11 @@ export interface User {
   nombre?: string;
   apellido?: string;
   profesorId?: number;
+  estudianteId?: number;
+  curso?: {
+    id: number;
+    nombre: string;
+  };
 }
 
 export interface LoginResponse {
@@ -22,6 +27,11 @@ export interface LoginResponse {
     user: User;
     token: string;
     profesorId?: number;
+    estudianteId?: number;
+    curso?: {
+      id: number;
+      nombre: string;
+    };
   };
 }
 
@@ -63,8 +73,8 @@ export interface Student {
     nombre: string;
   };
   calificaciones?: Grade[];
-  observaciones?: any[];
-  asistencias?: any[];
+  observaciones?: Observacion[];
+  asistencias?: Asistencia[];
 }
 
 export interface Profesor {
@@ -167,15 +177,15 @@ export interface Observacion {
 export async function getCourses(): Promise<Curso[]> {
   const res = await fetch(`${API_BASE}/api/courses`);
   if (!res.ok) throw new Error(`Error fetching courses: ${res.statusText}`);
-  const { courses } = await res.json();
-  return courses;
+  const json = await res.json();
+  return json.success ? json.data.courses : json.courses;
 }
 
 export async function getCourseById(id: number): Promise<Curso> {
   const res = await fetch(`${API_BASE}/api/courses/${id}`);
   if (!res.ok) throw new Error(`Error fetching course: ${res.statusText}`);
-  const { course } = await res.json();
-  return course;
+  const json = await res.json();
+  return json.success ? json.data.course : json.course;
 }
 
 export async function createCourse(data: { nombre: string; jefeId: number }): Promise<Curso> {
@@ -185,8 +195,8 @@ export async function createCourse(data: { nombre: string; jefeId: number }): Pr
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating course: ${res.statusText}`);
-  const { course } = await res.json();
-  return course;
+  const json = await res.json();
+  return json.success ? json.data.course : json.course;
 }
 
 export async function updateCourse(id: number, data: { nombre?: string; jefeId?: number }): Promise<Curso> {
@@ -196,8 +206,8 @@ export async function updateCourse(id: number, data: { nombre?: string; jefeId?:
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating course: ${res.statusText}`);
-  const { course } = await res.json();
-  return course;
+  const json = await res.json();
+  return json.success ? json.data.course : json.course;
 }
 
 export async function deleteCourse(id: number): Promise<void> {
@@ -208,10 +218,15 @@ export async function deleteCourse(id: number): Promise<void> {
 }
 
 export async function getCursosByProfesor(profesorId: number): Promise<Curso[]> {
+  console.log('🌐 Llamando a getCursosByProfesor...', { profesorId });
   const res = await fetch(`${API_BASE}/api/courses/profesor/${profesorId}`);
-  if (!res.ok) throw new Error(`Error fetching cursos by profesor: ${res.statusText}`);
-  const { cursos } = await res.json();
-  return cursos;
+  console.log('📡 Respuesta del servidor (cursos por profesor):', res.status, res.statusText);
+  if (!res.ok) throw new Error(`Error fetching courses by profesor: ${res.statusText}`);
+  const json = await res.json();
+  console.log('📦 JSON recibido (cursos por profesor):', json);
+  const result = json.success ? json.data.courses : json.courses;
+  console.log('🎯 Resultado final (cursos por profesor):', result);
+  return result;
 }
 
 // ——————————————
@@ -219,24 +234,29 @@ export async function getCursosByProfesor(profesorId: number): Promise<Curso[]> 
 // ——————————————
 
 export async function getStudents(): Promise<Student[]> {
+  console.log('🌐 Llamando a getStudents...');
   const res = await fetch(`${API_BASE}/api/estudiantes`);
+  console.log('📡 Respuesta del servidor:', res.status, res.statusText);
   if (!res.ok) throw new Error(`Error fetching students: ${res.statusText}`);
-  const { estudiantes } = await res.json();
-  return estudiantes;
+  const json = await res.json();
+  console.log('📦 JSON recibido:', json);
+  const result = json.success ? json.data.estudiantes : json.estudiantes;
+  console.log('🎯 Resultado final:', result);
+  return result;
 }
 
 export async function getEstudiantesByCurso(cursoId: number): Promise<Student[]> {
   const res = await fetch(`${API_BASE}/api/estudiantes/curso/${cursoId}`);
   if (!res.ok) throw new Error(`Error fetching students by course: ${res.statusText}`);
-  const { estudiantes } = await res.json();
-  return estudiantes;
+  const json = await res.json();
+  return json.success ? json.data.estudiantes : json.estudiantes;
 }
 
 export async function getStudentById(id: number): Promise<Student> {
   const res = await fetch(`${API_BASE}/api/estudiantes/${id}`);
   if (!res.ok) throw new Error(`Error fetching student: ${res.statusText}`);
-  const { estudiante } = await res.json();
-  return estudiante;
+  const json = await res.json();
+  return json.success ? json.data.estudiante : json.estudiante;
 }
 
 export async function createStudent(data: {
@@ -252,8 +272,8 @@ export async function createStudent(data: {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating student: ${res.statusText}`);
-  const { estudiante } = await res.json();
-  return estudiante;
+  const json = await res.json();
+  return json.success ? json.data.estudiante : json.estudiante;
 }
 
 export async function updateStudent(
@@ -272,8 +292,8 @@ export async function updateStudent(
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating student: ${res.statusText}`);
-  const { estudiante } = await res.json();
-  return estudiante;
+  const json = await res.json();
+  return json.success ? json.data.estudiante : json.estudiante;
 }
 
 export async function deleteStudent(id: number): Promise<void> {
@@ -288,17 +308,22 @@ export async function deleteStudent(id: number): Promise<void> {
 // ——————————————
 
 export async function getProfesores(): Promise<Profesor[]> {
+  console.log('🌐 Llamando a getProfesores...');
   const res = await fetch(`${API_BASE}/api/profesores`);
+  console.log('📡 Respuesta del servidor (profesores):', res.status, res.statusText);
   if (!res.ok) throw new Error(`Error fetching profesores: ${res.statusText}`);
-  const { profesores } = await res.json();
-  return profesores;
+  const json = await res.json();
+  console.log('📦 JSON recibido (profesores):', json);
+  const result = json.success ? json.data.profesores : json.profesores;
+  console.log('🎯 Resultado final (profesores):', result);
+  return result;
 }
 
 export async function getProfesorById(id: number): Promise<Profesor> {
   const res = await fetch(`${API_BASE}/api/profesores/${id}`);
   if (!res.ok) throw new Error(`Error fetching profesor: ${res.statusText}`);
-  const { profesor } = await res.json();
-  return profesor;
+  const json = await res.json();
+  return json.success ? json.data.profesor : json.profesor;
 }
 
 export async function createProfesor(data: {
@@ -313,8 +338,8 @@ export async function createProfesor(data: {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating profesor: ${res.statusText}`);
-  const { profesor } = await res.json();
-  return profesor;
+  const json = await res.json();
+  return json.success ? json.data.profesor : json.profesor;
 }
 
 export async function updateProfesor(
@@ -332,8 +357,8 @@ export async function updateProfesor(
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating profesor: ${res.statusText}`);
-  const { profesor } = await res.json();
-  return profesor;
+  const json = await res.json();
+  return json.success ? json.data.profesor : json.profesor;
 }
 
 export async function deleteProfesor(id: number): Promise<void> {
@@ -350,15 +375,15 @@ export async function deleteProfesor(id: number): Promise<void> {
 export async function getAsignaturas(): Promise<Asignatura[]> {
   const res = await fetch(`${API_BASE}/api/asignaturas`);
   if (!res.ok) throw new Error(`Error fetching asignaturas: ${res.statusText}`);
-  const { asignaturas } = await res.json();
-  return asignaturas;
+  const json = await res.json();
+  return json.success ? json.data.asignaturas : json.asignaturas;
 }
 
 export async function getAsignaturaById(id: number): Promise<Asignatura> {
   const res = await fetch(`${API_BASE}/api/asignaturas/${id}`);
   if (!res.ok) throw new Error(`Error fetching asignatura: ${res.statusText}`);
-  const { asignatura } = await res.json();
-  return asignatura;
+  const json = await res.json();
+  return json.success ? json.data.asignatura : json.asignatura;
 }
 
 export async function createAsignatura(data: { nombre: string }): Promise<Asignatura> {
@@ -368,8 +393,8 @@ export async function createAsignatura(data: { nombre: string }): Promise<Asigna
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating asignatura: ${res.statusText}`);
-  const { asignatura } = await res.json();
-  return asignatura;
+  const json = await res.json();
+  return json.success ? json.data.asignatura : json.asignatura;
 }
 
 export async function updateAsignatura(id: number, data: { nombre?: string }): Promise<Asignatura> {
@@ -379,8 +404,8 @@ export async function updateAsignatura(id: number, data: { nombre?: string }): P
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating asignatura: ${res.statusText}`);
-  const { asignatura } = await res.json();
-  return asignatura;
+  const json = await res.json();
+  return json.success ? json.data.asignatura : json.asignatura;
 }
 
 export async function deleteAsignatura(id: number): Promise<void> {
@@ -415,22 +440,22 @@ export async function removeProfesorFromAsignatura(asignaturaId: number, profeso
 export async function getGrades(studentId: number): Promise<Grade[]> {
   const res = await fetch(`${API_BASE}/api/grades/estudiante/${studentId}`);
   if (!res.ok) throw new Error(`Error fetching grades: ${res.statusText}`);
-  const { calificaciones } = await res.json();
-  return calificaciones;
+  const json = await res.json();
+  return json.success ? json.data.calificaciones : json.calificaciones;
 }
 
 export async function getAllGrades(): Promise<Grade[]> {
-  const res = await fetch(`${API_BASE}/api/grades/all`);
-  if (!res.ok) throw new Error(`Error fetching grades: ${res.statusText}`);
-  const { calificaciones } = await res.json();
-  return calificaciones;
+  const res = await fetch(`${API_BASE}/api/grades`);
+  if (!res.ok) throw new Error(`Error fetching all grades: ${res.statusText}`);
+  const json = await res.json();
+  return json.success ? json.data.calificaciones : json.calificaciones;
 }
 
 export async function getGradeById(id: number): Promise<Grade> {
-  const res = await fetch(`${API_BASE}/api/grades/id/${id}`);
+  const res = await fetch(`${API_BASE}/api/grades/${id}`);
   if (!res.ok) throw new Error(`Error fetching grade: ${res.statusText}`);
-  const { calificacion } = await res.json();
-  return calificacion;
+  const json = await res.json();
+  return json.success ? json.data.calificacion : json.calificacion;
 }
 
 export async function createGrade(data: {
@@ -445,8 +470,8 @@ export async function createGrade(data: {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating grade: ${res.statusText}`);
-  const { calificacion } = await res.json();
-  return calificacion;
+  const json = await res.json();
+  return json.success ? json.data.calificacion : json.calificacion;
 }
 
 export async function updateGrade(
@@ -463,8 +488,8 @@ export async function updateGrade(
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating grade: ${res.statusText}`);
-  const { calificacion } = await res.json();
-  return calificacion;
+  const json = await res.json();
+  return json.success ? json.data.calificacion : json.calificacion;
 }
 
 export async function deleteGrade(id: number): Promise<void> {
@@ -475,10 +500,15 @@ export async function deleteGrade(id: number): Promise<void> {
 }
 
 export async function getGradesByProfesor(profesorId: number): Promise<Grade[]> {
+  console.log('🌐 Llamando a getGradesByProfesor...', { profesorId });
   const res = await fetch(`${API_BASE}/api/grades/profesor/${profesorId}`);
+  console.log('📡 Respuesta del servidor (calificaciones por profesor):', res.status, res.statusText);
   if (!res.ok) throw new Error(`Error fetching grades by profesor: ${res.statusText}`);
-  const { calificaciones } = await res.json();
-  return calificaciones;
+  const json = await res.json();
+  console.log('📦 JSON recibido (calificaciones por profesor):', json);
+  const result = json.success ? json.data.calificaciones : json.calificaciones;
+  console.log('🎯 Resultado final (calificaciones por profesor):', result);
+  return result;
 }
 
 // ——————————————
@@ -488,22 +518,22 @@ export async function getGradesByProfesor(profesorId: number): Promise<Grade[]> 
 export async function getAsistencias(): Promise<Asistencia[]> {
   const res = await fetch(`${API_BASE}/api/asistencias`);
   if (!res.ok) throw new Error(`Error fetching asistencias: ${res.statusText}`);
-  const { asistencias } = await res.json();
-  return asistencias;
+  const json = await res.json();
+  return json.success ? json.data.asistencias : json.asistencias;
 }
 
 export async function getAsistenciaById(id: number): Promise<Asistencia> {
   const res = await fetch(`${API_BASE}/api/asistencias/${id}`);
   if (!res.ok) throw new Error(`Error fetching asistencia: ${res.statusText}`);
-  const { asistencia } = await res.json();
-  return asistencia;
+  const json = await res.json();
+  return json.success ? json.data.asistencia : json.asistencia;
 }
 
 export async function getAsistenciasByEstudiante(estudianteId: number): Promise<Asistencia[]> {
   const res = await fetch(`${API_BASE}/api/asistencias/estudiante/${estudianteId}`);
-  if (!res.ok) throw new Error(`Error fetching asistencias: ${res.statusText}`);
-  const { asistencias } = await res.json();
-  return asistencias;
+  if (!res.ok) throw new Error(`Error fetching asistencias by estudiante: ${res.statusText}`);
+  const json = await res.json();
+  return json.success ? json.data.asistencias : json.asistencias;
 }
 
 export async function createAsistencia(data: {
@@ -517,8 +547,8 @@ export async function createAsistencia(data: {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating asistencia: ${res.statusText}`);
-  const { asistencia } = await res.json();
-  return asistencia;
+  const json = await res.json();
+  return json.success ? json.data.asistencia : json.asistencia;
 }
 
 export async function updateAsistencia(
@@ -534,8 +564,8 @@ export async function updateAsistencia(
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating asistencia: ${res.statusText}`);
-  const { asistencia } = await res.json();
-  return asistencia;
+  const json = await res.json();
+  return json.success ? json.data.asistencia : json.asistencia;
 }
 
 export async function deleteAsistencia(id: number): Promise<void> {
@@ -546,7 +576,7 @@ export async function deleteAsistencia(id: number): Promise<void> {
 }
 
 // ——————————————
-//  Inscripciones (mantener compatibilidad)
+//  Matriculas
 // ——————————————
 
 export async function createEnrollment(payload: {
@@ -555,15 +585,14 @@ export async function createEnrollment(payload: {
 }): Promise<Enrollment> {
   const res = await fetch(`${API_BASE}/api/enrollments`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) {
-    const errMsg = await res.text();
-    throw new Error(errMsg || res.statusText);
-  }
-  const { enrollment } = await res.json();
-  return enrollment;
+  if (!res.ok) throw new Error(`Error creating enrollment: ${res.statusText}`);
+  const json = await res.json();
+  return json.success ? json.data.enrollment : json.enrollment;
 }
 
 // ——————————————
@@ -576,30 +605,18 @@ export async function login(email: string, password: string): Promise<LoginRespo
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || 'Error en login');
-  }
-  
-  return res.json();
+  if (!res.ok) throw new Error(`Error logging in: ${res.statusText}`);
+  return await res.json();
 }
 
 export async function verifyToken(token: string): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/api/auth/verify`, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
   });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || 'Error verificando token');
-  }
-  
-  return res.json();
+  if (!res.ok) throw new Error(`Error verifying token: ${res.statusText}`);
+  return await res.json();
 }
 
 export async function logout(): Promise<{ success: boolean; message: string }> {
@@ -607,13 +624,8 @@ export async function logout(): Promise<{ success: boolean; message: string }> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || 'Error en logout');
-  }
-  
-  return res.json();
+  if (!res.ok) throw new Error(`Error logging out: ${res.statusText}`);
+  return await res.json();
 }
 
 // ——————————————
@@ -623,8 +635,8 @@ export async function logout(): Promise<{ success: boolean; message: string }> {
 export async function getObservacionesByEstudiante(estudianteId: number): Promise<Observacion[]> {
   const res = await fetch(`${API_BASE}/api/observaciones/estudiante/${estudianteId}`);
   if (!res.ok) throw new Error(`Error fetching observaciones: ${res.statusText}`);
-  const { observaciones } = await res.json();
-  return observaciones;
+  const json = await res.json();
+  return json.success ? json.data.observaciones : json.observaciones;
 }
 
 export async function createObservacion(data: { estudianteId: number; profesorId: number; texto: string; estado?: "negativa" | "neutro" | "positiva" }): Promise<Observacion> {
@@ -634,8 +646,8 @@ export async function createObservacion(data: { estudianteId: number; profesorId
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error creating observacion: ${res.statusText}`);
-  const { observacion } = await res.json();
-  return observacion;
+  const json = await res.json();
+  return json.success ? json.data.observacion : json.observacion;
 }
 
 export async function updateObservacion(id: number, data: { texto?: string; estado?: "negativa" | "neutro" | "positiva" }): Promise<Observacion> {
@@ -645,20 +657,50 @@ export async function updateObservacion(id: number, data: { texto?: string; esta
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Error updating observacion: ${res.statusText}`);
-  const { observacion } = await res.json();
-  return observacion;
+  const json = await res.json();
+  return json.success ? json.data.observacion : json.observacion;
 }
 
 export async function deleteObservacion(id: number): Promise<void> {
   const res = await fetch(`${API_BASE}/api/observaciones/${id}`, {
-    method: "DELETE"
+    method: "DELETE",
   });
   if (!res.ok) throw new Error(`Error deleting observacion: ${res.statusText}`);
 }
 
 export async function getObservacionesByProfesor(profesorId: number): Promise<Observacion[]> {
+  console.log('🌐 Llamando a getObservacionesByProfesor...', { profesorId });
   const res = await fetch(`${API_BASE}/api/observaciones/profesor/${profesorId}`);
+  console.log('📡 Respuesta del servidor (observaciones por profesor):', res.status, res.statusText);
   if (!res.ok) throw new Error(`Error fetching observaciones by profesor: ${res.statusText}`);
-  const { observaciones } = await res.json();
-  return observaciones;
+  const json = await res.json();
+  console.log('📦 JSON recibido (observaciones por profesor):', json);
+  const result = json.success ? json.data.observaciones : json.observaciones;
+  console.log('🎯 Resultado final (observaciones por profesor):', result);
+  return result;
+}
+
+// ——————————————
+//  Funciones adicionales
+// ——————————————
+
+export async function getEstudianteById(id: number): Promise<Student> {
+  const res = await fetch(`${API_BASE}/api/estudiantes/${id}`);
+  if (!res.ok) throw new Error(`Error fetching estudiante: ${res.statusText}`);
+  const json = await res.json();
+  return json.success ? json.data.estudiante : json.estudiante;
+}
+
+export async function getCursosByEstudiante(estudianteId: number): Promise<Curso[]> {
+  const res = await fetch(`${API_BASE}/api/courses/estudiante/${estudianteId}`);
+  if (!res.ok) throw new Error(`Error fetching cursos by estudiante: ${res.statusText}`);
+  const json = await res.json();
+  return json.success ? json.data.courses : json.courses;
+}
+
+export async function getGradesByEstudiante(estudianteId: number): Promise<Grade[]> {
+  const res = await fetch(`${API_BASE}/api/grades/estudiante/${estudianteId}`);
+  if (!res.ok) throw new Error(`Error fetching grades by estudiante: ${res.statusText}`);
+  const json = await res.json();
+  return json.success ? json.data.calificaciones : json.calificaciones;
 }

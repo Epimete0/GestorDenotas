@@ -1,5 +1,5 @@
 // frontend/src/pages/Dashboard.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { 
@@ -22,17 +22,20 @@ const Dashboard: React.FC = () => {
   const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
   const [calificaciones, setCalificaciones] = useState<Grade[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
+        setError(null);
+        
         if (user?.role === 'profesor' && user?.profesorId) {
           // Cargar todos los datos y filtrar por profesor
           const [cursosData, estudiantesData, asistenciasData, calificacionesData] = await Promise.all([
-            getCourses(),
-            getStudents(),
-            getAsistencias(),
-            getAllGrades() // Obtener todas las calificaciones
+            getCourses().catch(() => []),
+            getStudents().catch(() => []),
+            getAsistencias().catch(() => []),
+            getAllGrades().catch(() => [])
           ]);
 
           // Filtrar cursos donde el profesor es jefe de curso
@@ -59,18 +62,26 @@ const Dashboard: React.FC = () => {
           setCalificaciones(calificacionesDelProfesor);
         } else {
           // Para admin, cargar todos los datos
-          const [cursosData, estudiantesData, asistenciasData] = await Promise.all([
-            getCourses(),
-            getStudents(),
-            getAsistencias()
+          const [cursosData, estudiantesData, asistenciasData, calificacionesData] = await Promise.all([
+            getCourses().catch(() => []),
+            getStudents().catch(() => []),
+            getAsistencias().catch(() => []),
+            getAllGrades().catch(() => [])
           ]);
           
           setCursos(cursosData);
           setEstudiantes(estudiantesData);
           setAsistencias(asistenciasData);
+          setCalificaciones(calificacionesData);
         }
       } catch (error) {
         console.error('Error cargando datos del dashboard:', error);
+        setError('Error al cargar los datos del dashboard');
+        // Asegurar que los arrays estén inicializados como vacíos
+        setCursos([]);
+        setEstudiantes([]);
+        setAsistencias([]);
+        setCalificaciones([]);
       } finally {
         setLoading(false);
       }
@@ -100,6 +111,11 @@ const Dashboard: React.FC = () => {
           Bienvenido, {user?.nombre || user?.email}
           {isProfesor && ' - Profesor'}
         </p>
+        {error && (
+          <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
+            {error}
+          </div>
+        )}
       </div>
 
       <div className="dashboard-cards">
@@ -107,10 +123,10 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-card">
           <div className="card-header">
             <h3>Mis Cursos</h3>
-            <span className="card-number">{cursos.length}</span>
+            <span className="card-number">{cursos?.length || 0}</span>
           </div>
           <div className="card-content">
-            {cursos.length > 0 ? (
+            {cursos && cursos.length > 0 ? (
               <ul className="card-list">
                 {cursos.slice(0, 3).map(curso => (
                   <li key={curso.id}>{curso.nombre}</li>
@@ -124,7 +140,7 @@ const Dashboard: React.FC = () => {
           {isProfesor && (
             <button 
               className="card-action"
-              onClick={() => navigate('/cursos')}
+              onClick={() => navigate('/dashboard-profesor/cursos')}
             >
               Ver Cursos
             </button>
@@ -135,10 +151,10 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-card">
           <div className="card-header">
             <h3>Mis Estudiantes</h3>
-            <span className="card-number">{estudiantes.length}</span>
+            <span className="card-number">{estudiantes?.length || 0}</span>
           </div>
           <div className="card-content">
-            {estudiantes.length > 0 ? (
+            {estudiantes && estudiantes.length > 0 ? (
               <ul className="card-list">
                 {estudiantes.slice(0, 3).map(estudiante => (
                   <li key={estudiante.id}>
@@ -165,10 +181,10 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-card">
           <div className="card-header">
             <h3>Asistencias Recientes</h3>
-            <span className="card-number">{asistencias.length}</span>
+            <span className="card-number">{asistencias?.length || 0}</span>
           </div>
           <div className="card-content">
-            {asistencias.length > 0 ? (
+            {asistencias && asistencias.length > 0 ? (
               <div className="attendance-summary">
                 <div className="attendance-item">
                   <span className="attendance-label">Presentes:</span>
@@ -196,7 +212,7 @@ const Dashboard: React.FC = () => {
           {isProfesor && (
             <button 
               className="card-action"
-              onClick={() => navigate('/asistencia')}
+              onClick={() => navigate('/dashboard-profesor/asistencia')}
             >
               Gestionar Asistencia
             </button>
@@ -207,10 +223,10 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-card">
           <div className="card-header">
             <h3>Calificaciones</h3>
-            <span className="card-number">{calificaciones.length}</span>
+            <span className="card-number">{calificaciones?.length || 0}</span>
           </div>
           <div className="card-content">
-            {calificaciones.length > 0 ? (
+            {calificaciones && calificaciones.length > 0 ? (
               <div className="grades-summary">
                 <div className="grade-stats">
                   <div className="grade-stat">
@@ -234,7 +250,7 @@ const Dashboard: React.FC = () => {
           {isProfesor && (
             <button 
               className="card-action"
-              onClick={() => navigate('/calificaciones')}
+              onClick={() => navigate('/dashboard-profesor/calificaciones')}
             >
               Gestionar Calificaciones
             </button>
@@ -252,13 +268,13 @@ const Dashboard: React.FC = () => {
                 <>
                   <button 
                     className="quick-action-btn"
-                    onClick={() => navigate('/asistencia')}
+                    onClick={() => navigate('/dashboard-profesor/asistencia')}
                   >
                     Tomar Asistencia
                   </button>
                   <button 
                     className="quick-action-btn"
-                    onClick={() => navigate('/calificaciones')}
+                    onClick={() => navigate('/dashboard-profesor/calificaciones')}
                   >
                     Agregar Calificación
                   </button>
@@ -273,19 +289,19 @@ const Dashboard: React.FC = () => {
                 <>
                   <button 
                     className="quick-action-btn"
-                    onClick={() => navigate('/estudiantes')}
+                    onClick={() => navigate('/admin/estudiantes')}
                   >
                     Gestionar Estudiantes
                   </button>
                   <button 
                     className="quick-action-btn"
-                    onClick={() => navigate('/cursos')}
+                    onClick={() => navigate('/admin/courses')}
                   >
                     Gestionar Cursos
                   </button>
                   <button 
                     className="quick-action-btn"
-                    onClick={() => navigate('/profesores')}
+                    onClick={() => navigate('/admin/profesores')}
                   >
                     Gestionar Profesores
                   </button>

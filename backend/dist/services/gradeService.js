@@ -20,6 +20,7 @@ exports.getGradesByProfesor = getGradesByProfesor;
 exports.getEstadisticasCalificaciones = getEstadisticasCalificaciones;
 // backend/src/services/gradeService.ts
 const gradeRepository_1 = require("../repositories/gradeRepository");
+const errors_1 = require("../config/errors");
 /**
  * Registra una nueva calificación para un estudiante en una asignatura,
  * indicando también el profesor que la asigna.
@@ -33,23 +34,28 @@ function addGrade(estudianteId, asignaturaId, profesorId, valor) {
     return __awaiter(this, void 0, void 0, function* () {
         // Validaciones básicas
         if (estudianteId <= 0) {
-            throw new Error("ID de estudiante inválido");
+            throw errors_1.createError.validation('ID de estudiante inválido');
         }
         if (asignaturaId <= 0) {
-            throw new Error("ID de asignatura inválido");
+            throw errors_1.createError.validation('ID de asignatura inválido');
         }
         if (profesorId <= 0) {
-            throw new Error("ID de profesor inválido");
+            throw errors_1.createError.validation('ID de profesor inválido');
         }
         if (valor < 1.0 || valor > 7.0) {
-            throw new Error("La calificación debe estar entre 1.0 y 7.0");
+            throw errors_1.createError.validation('La calificación debe estar entre 1.0 y 7.0');
         }
-        return gradeRepository_1.gradeRepository.create({
-            estudianteId,
-            asignaturaId,
-            profesorId,
-            valor,
-        });
+        try {
+            return yield gradeRepository_1.gradeRepository.create({
+                estudianteId,
+                asignaturaId,
+                profesorId,
+                valor,
+            });
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al crear calificación');
+        }
     });
 }
 /**
@@ -61,13 +67,15 @@ function addGrade(estudianteId, asignaturaId, profesorId, valor) {
 function getGrades(estudianteId) {
     return __awaiter(this, void 0, void 0, function* () {
         if (estudianteId <= 0) {
-            throw new Error("ID de estudiante inválido");
+            throw errors_1.createError.validation('ID de estudiante inválido');
         }
-        const calificaciones = yield gradeRepository_1.gradeRepository.findByEstudiante(estudianteId);
-        if (!calificaciones || calificaciones.length === 0) {
-            throw new Error("No se encontraron calificaciones para el estudiante");
+        try {
+            const calificaciones = yield gradeRepository_1.gradeRepository.findByEstudiante(estudianteId);
+            return calificaciones || [];
         }
-        return calificaciones;
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener calificaciones del estudiante');
+        }
     });
 }
 /**
@@ -76,71 +84,124 @@ function getGrades(estudianteId) {
  */
 function getAllGrades() {
     return __awaiter(this, void 0, void 0, function* () {
-        return gradeRepository_1.gradeRepository.findAll();
+        try {
+            return yield gradeRepository_1.gradeRepository.findAll();
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener todas las calificaciones');
+        }
     });
 }
 function getGradeById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const grade = yield gradeRepository_1.gradeRepository.findById(id);
-        if (!grade) {
-            throw new Error("Calificación no encontrada");
+        if (id <= 0) {
+            throw errors_1.createError.validation('ID de calificación inválido');
         }
-        return grade;
+        try {
+            const grade = yield gradeRepository_1.gradeRepository.findById(id);
+            if (!grade) {
+                throw errors_1.createError.notFound('Calificación no encontrada');
+            }
+            return grade;
+        }
+        catch (error) {
+            if (error instanceof Error && error.message === 'Calificación no encontrada') {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al obtener calificación');
+        }
     });
 }
 function updateGrade(id, data) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Verificar que la calificación existe
-        yield getGradeById(id);
-        // Validaciones básicas
-        if (data.valor && (data.valor < 1.0 || data.valor > 7.0)) {
-            throw new Error("La calificación debe estar entre 1.0 y 7.0");
+        try {
+            // Verificar que la calificación existe
+            yield getGradeById(id);
+            // Validaciones básicas
+            if (data.valor && (data.valor < 1.0 || data.valor > 7.0)) {
+                throw errors_1.createError.validation('La calificación debe estar entre 1.0 y 7.0');
+            }
+            if (data.asignaturaId && data.asignaturaId <= 0) {
+                throw errors_1.createError.validation('ID de asignatura inválido');
+            }
+            if (data.profesorId && data.profesorId <= 0) {
+                throw errors_1.createError.validation('ID de profesor inválido');
+            }
+            return yield gradeRepository_1.gradeRepository.update(id, data);
         }
-        if (data.asignaturaId && data.asignaturaId <= 0) {
-            throw new Error("ID de asignatura inválido");
+        catch (error) {
+            if (error instanceof Error && error.message.includes('Calificación no encontrada')) {
+                throw error;
+            }
+            if (error instanceof Error && error.message.includes('La calificación debe estar')) {
+                throw error;
+            }
+            if (error instanceof Error && error.message.includes('ID de')) {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al actualizar calificación');
         }
-        if (data.profesorId && data.profesorId <= 0) {
-            throw new Error("ID de profesor inválido");
-        }
-        return gradeRepository_1.gradeRepository.update(id, data);
     });
 }
 function deleteGrade(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Verificar que la calificación existe
-        yield getGradeById(id);
-        return gradeRepository_1.gradeRepository.delete(id);
+        try {
+            // Verificar que la calificación existe
+            yield getGradeById(id);
+            return yield gradeRepository_1.gradeRepository.delete(id);
+        }
+        catch (error) {
+            if (error instanceof Error && error.message.includes('Calificación no encontrada')) {
+                throw error;
+            }
+            throw errors_1.createError.internal('Error al eliminar calificación');
+        }
     });
 }
 function getGradesByAsignatura(asignaturaId) {
     return __awaiter(this, void 0, void 0, function* () {
         if (asignaturaId <= 0) {
-            throw new Error("ID de asignatura inválido");
+            throw errors_1.createError.validation('ID de asignatura inválido');
         }
-        return gradeRepository_1.gradeRepository.findByAsignatura(asignaturaId);
+        try {
+            return yield gradeRepository_1.gradeRepository.findByAsignatura(asignaturaId);
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener calificaciones por asignatura');
+        }
     });
 }
 function getGradesByProfesor(profesorId) {
     return __awaiter(this, void 0, void 0, function* () {
         if (profesorId <= 0) {
-            throw new Error("ID de profesor inválido");
+            throw errors_1.createError.validation('ID de profesor inválido');
         }
-        return gradeRepository_1.gradeRepository.findByProfesor(profesorId);
+        try {
+            return yield gradeRepository_1.gradeRepository.findByProfesor(profesorId);
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener calificaciones por profesor');
+        }
     });
 }
 function getEstadisticasCalificaciones() {
     return __awaiter(this, void 0, void 0, function* () {
-        const calificaciones = yield gradeRepository_1.gradeRepository.findAll();
-        const total = calificaciones.length;
-        const promedio = total > 0 ? calificaciones.reduce((sum, g) => sum + g.valor, 0) / total : 0;
-        const aprobadas = calificaciones.filter((g) => g.valor >= 4.0).length;
-        const reprobadas = calificaciones.filter((g) => g.valor < 4.0).length;
-        return {
-            total,
-            promedio,
-            aprobadas,
-            reprobadas,
-            porcentajeAprobacion: total > 0 ? (aprobadas / total) * 100 : 0,
-        };
+        try {
+            const calificaciones = yield gradeRepository_1.gradeRepository.findAll();
+            const total = calificaciones.length;
+            const promedio = total > 0 ? calificaciones.reduce((sum, g) => sum + g.valor, 0) / total : 0;
+            const aprobadas = calificaciones.filter((g) => g.valor >= 4.0).length;
+            const reprobadas = calificaciones.filter((g) => g.valor < 4.0).length;
+            return {
+                total,
+                promedio,
+                aprobadas,
+                reprobadas,
+                porcentajeAprobacion: total > 0 ? (aprobadas / total) * 100 : 0,
+            };
+        }
+        catch (error) {
+            throw errors_1.createError.internal('Error al obtener estadísticas de calificaciones');
+        }
     });
 }

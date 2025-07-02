@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_1 = require("./config/prisma");
+const errors_1 = require("./config/errors");
 // Importa TODOS tus controllers:
 const courseController_1 = __importDefault(require("./controllers/courseController"));
 const gradeController_1 = __importDefault(require("./controllers/gradeController"));
@@ -61,10 +62,12 @@ app.use("/api/profesores", profesorController_1.default);
 app.use("/api/asistencias", asistenciaController_1.default);
 app.use("/api/summary", summaryController_1.default);
 app.use("/api/observaciones", observacionController_1.default);
-// Manejador de errores
+// Manejador de errores mejorado
 app.use((err, _req, res, _next) => {
     console.error("💥 Error en el servidor:", err);
-    res.status(500).json({ error: "Internal server error" });
+    const errorResponse = (0, errors_1.formatErrorResponse)(err);
+    const statusCode = err instanceof errors_1.AppErrorClass ? err.statusCode : 500;
+    res.status(statusCode).json(errorResponse);
 });
 // Arranque del servidor
 const PORT = process.env.PORT || 4000;

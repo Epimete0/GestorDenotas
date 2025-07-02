@@ -1,5 +1,5 @@
 // frontend/src/pages/Calificaciones.tsx
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getStudents, getGrades, getAsignaturas, getProfesores, createGrade, updateGrade, deleteGrade } from "../services/api";
 import type { Student, Grade, Asignatura, Profesor } from "../services/api";
 import "./Calificaciones.css";
@@ -87,7 +87,7 @@ export default function Calificaciones() {
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [profesores, setProfesores] = useState<Profesor[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<number | "">("");
-  const [grades, setGrades] = useState<Grade[]>([]);
+  const [studentGrades, setStudentGrades] = useState<Grade[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,13 +97,6 @@ export default function Calificaciones() {
   const [value, setValue] = useState("");
   const [formMsg, setFormMsg] = useState<string>("");
   const [formLoading, setFormLoading] = useState(false);
-
-  // Editar
-  const [editId, setEditId] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState<string>("");
-  const [editLoading, setEditLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
-  const [editError, setEditError] = useState<string | null>(null);
 
   // Modal
   const [modalGrade, setModalGrade] = useState<Grade | null>(null);
@@ -124,11 +117,11 @@ export default function Calificaciones() {
     if (selectedStudent !== "") {
       setLoading(true);
       getGrades(selectedStudent as number)
-        .then(setGrades)
+        .then(setStudentGrades)
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
     } else {
-      setGrades([]);
+      setStudentGrades([]);
     }
   }, [selectedStudent]);
 
@@ -153,7 +146,7 @@ export default function Calificaciones() {
       });
 
       // Agregar la nueva calificación a la lista
-      setGrades(prev => [nuevaCalificacion, ...prev]);
+      setStudentGrades(prev => [nuevaCalificacion, ...prev]);
       
       // Limpiar formulario
       setSubjectId("");
@@ -162,8 +155,8 @@ export default function Calificaciones() {
       setFormMsg("✅ Calificación agregada exitosamente");
       
       setTimeout(() => setFormMsg(""), 3000);
-    } catch (err: any) {
-      setFormMsg(`❌ Error: ${err.message}`);
+    } catch (err: unknown) {
+      setFormMsg(err instanceof Error ? err.message : "Error al crear calificación");
     } finally {
       setFormLoading(false);
     }
@@ -175,11 +168,7 @@ export default function Calificaciones() {
       <path d="M14.7 2.29a1 1 0 0 1 1.42 0l1.59 1.59a1 1 0 0 1 0 1.42l-9.3 9.3-2.12.71.71-2.12 9.3-9.3zM3 17h14v2H3v-2z" fill="currentColor"/>
     </svg>
   );
-  const IconDelete = (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 7v8a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7M9 3h2a2 2 0 0 1 2 2v1H7V5a2 2 0 0 1 2-2zM4 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
+
 
   // Handlers edición y borrado
   const openModal = (grade: Grade) => {
@@ -196,10 +185,10 @@ export default function Calificaciones() {
     try {
       if (isNaN(valor) || valor < 1 || valor > 7) throw new Error("Valor inválido (1-7)");
       const updated = await updateGrade(modalGrade!.id, { valor });
-      setGrades((prev) => prev.map((g) => (g.id === modalGrade!.id ? { ...g, valor: updated.valor } : g)));
+      setStudentGrades((prev) => prev.map((g) => (g.id === modalGrade!.id ? { ...g, valor: updated.valor } : g)));
       closeModal();
-    } catch (err: any) {
-      setModalError(err.message);
+    } catch (err: unknown) {
+      setModalError(err instanceof Error ? err.message : "Error al actualizar calificación");
     } finally {
       setModalLoading(false);
     }
@@ -209,10 +198,10 @@ export default function Calificaciones() {
     setModalLoading(true);
     try {
       await deleteGrade(modalGrade!.id);
-      setGrades((prev) => prev.filter((g) => g.id !== modalGrade!.id));
+      setStudentGrades((prev) => prev.filter((g) => g.id !== modalGrade!.id));
       closeModal();
-    } catch (err: any) {
-      setModalError(err.message);
+    } catch (err: unknown) {
+      setModalError(err instanceof Error ? err.message : "Error al eliminar calificación");
     } finally {
       setModalLoading(false);
     }
@@ -221,7 +210,7 @@ export default function Calificaciones() {
   function exportarPDF(grades: Grade[]) {
     const doc = new jsPDF();
     doc.text("Reporte de Calificaciones", 14, 16);
-    (doc as any).autoTable({
+    (doc as jsPDF & { autoTable: (...args: unknown[]) => void }).autoTable({
       startY: 22,
       head: [["Asignatura", "Valor", "Fecha", "Profesor"]],
       body: grades.map((g) => [
@@ -248,6 +237,12 @@ export default function Calificaciones() {
     XLSX.writeFile(wb, "calificaciones.xlsx");
   }
 
+  // Seguridad: siempre usar un array
+  const studentsList = Array.isArray(students) ? students : [];
+  const asignaturasList = Array.isArray(asignaturas) ? asignaturas : [];
+  const profesoresList = Array.isArray(profesores) ? profesores : [];
+  const gradesList = Array.isArray(studentGrades) ? studentGrades : [];
+
   return (
     <div className="calificaciones-page">
       <h2 className="page-title">Calificaciones de Estudiantes</h2>
@@ -259,7 +254,7 @@ export default function Calificaciones() {
           <label>Nombre del Estudiante</label>
           <select value={selectedStudent} onChange={e => setSelectedStudent(Number(e.target.value))} required>
             <option value="">Selecciona un estudiante</option>
-            {students.map(s => (
+            {studentsList.map(s => (
               <option key={s.id} value={s.id}>{s.nombre} {s.apellido}</option>
             ))}
           </select>
@@ -268,7 +263,7 @@ export default function Calificaciones() {
           <label>Curso</label>
           <select value={subjectId} onChange={e => setSubjectId(Number(e.target.value))} required>
             <option value="">Selecciona un curso</option>
-            {asignaturas.map(a => (
+            {asignaturasList.map(a => (
               <option key={a.id} value={a.id}>{a.nombre}</option>
             ))}
           </select>
@@ -277,32 +272,105 @@ export default function Calificaciones() {
           <label>Profesor</label>
           <select value={profesorId} onChange={e => setProfesorId(Number(e.target.value))} required>
             <option value="">Selecciona un profesor</option>
-            {profesores.map(p => (
+            {profesoresList.map(p => (
               <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>
             ))}
           </select>
         </div>
         <div className="form-group">
-          <label>Calificación</label>
+          <label>Valor (1-7)</label>
           <input
             type="number"
-            min={1}
-            max={7}
-            step={0.01}
-            placeholder="Ingresa la calificación"
+            min="1"
+            max="7"
+            step="0.01"
             value={value}
             onChange={e => setValue(e.target.value)}
             required
           />
         </div>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 24 }}>
-          <button className="btn-primary" type="submit" disabled={formLoading} style={{ minWidth: 120 }}>
-            Guardar calificación
-          </button>
-        </div>
-        {formMsg && <div className={formMsg.startsWith('✅') ? 'feedback success' : 'feedback error'}>{formMsg}</div>}
+        <button type="submit" disabled={formLoading} className="submit-btn">
+          {formLoading ? "Agregando..." : "Agregar Calificación"}
+        </button>
+        {formMsg && <div className="form-message">{formMsg}</div>}
       </form>
-      {/* Aquí puedes mostrar el listado de calificaciones si lo deseas debajo o al costado */}
+
+      {error && (
+        <div className="error-message">
+          ❌ Error: {error}
+        </div>
+      )}
+
+      {selectedStudent && (
+        <div className="grades-section">
+          <div className="section-header">
+            <h3>Calificaciones del Estudiante</h3>
+            {gradesList.length > 0 && (
+              <div className="export-buttons">
+                <button onClick={() => exportarPDF(gradesList)} className="export-btn">
+                  📄 Exportar PDF
+                </button>
+                <button onClick={() => exportarExcel(gradesList)} className="export-btn">
+                  📊 Exportar Excel
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {loading ? (
+            <div className="loading">Cargando calificaciones...</div>
+          ) : gradesList.length === 0 ? (
+            <div className="no-data">No hay calificaciones para mostrar</div>
+          ) : (
+            <div className="grades-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Asignatura</th>
+                    <th>Valor</th>
+                    <th>Fecha</th>
+                    <th>Profesor</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gradesList.map((grade) => (
+                    <tr key={grade.id}>
+                      <td>{grade.asignatura.nombre}</td>
+                      <td className={`grade-value grade-${Math.floor(grade.valor)}`}>
+                        {grade.valor.toFixed(2)}
+                      </td>
+                      <td>{new Date(grade.fecha).toLocaleDateString()}</td>
+                      <td>{grade.profesor.nombre} {grade.profesor.apellido}</td>
+                      <td>
+                        <button
+                          onClick={() => openModal(grade)}
+                          className="action-btn edit-btn"
+                          title="Editar"
+                        >
+                          {IconEdit}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {modalGrade && (
+        <EditarNotaModal
+          grade={modalGrade}
+          open={!!modalGrade}
+          onClose={closeModal}
+          onSave={handleModalSave}
+          onDelete={handleModalDelete}
+          loading={modalLoading}
+          error={modalError}
+        />
+      )}
     </div>
   );
 }

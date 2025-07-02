@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { login as apiLogin, verifyToken as apiVerifyToken, logout as apiLogout } from '../services/api';
 import type { User } from '../services/api';
@@ -33,7 +33,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Verificar si hay un usuario guardado en localStorage al cargar la app
     const token = localStorage.getItem('authToken');
     const savedUser = localStorage.getItem('user');
-    console.log('Al recargar, usuario en localStorage:', savedUser); // DEBUG
     
     if (token && savedUser) {
       try {
@@ -41,7 +40,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Verificar token con el backend
         apiVerifyToken(token)
           .then(response => {
-            console.log('Respuesta de verificación de token:', response); // DEBUG
             if (response.success) {
               setUser(response.data.user);
               localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -59,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           .finally(() => {
             setLoading(false);
           });
-      } catch (error) {
+      } catch {
         // Si hay error al parsear, limpiar datos corruptos
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
@@ -75,22 +73,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await apiLogin(email, password);
       
       if (response.success) {
-        const { user, token, profesorId } = response.data;
+        const { user, token, profesorId, estudianteId, curso } = response.data;
         
-        // Agregar profesorId al user si existe
-        const userWithProfesorId = profesorId ? { ...user, profesorId } : user;
+        // Agregar IDs y datos adicionales al user según el rol
+        let userWithData = user;
+        if (profesorId) {
+          userWithData = { ...user, profesorId };
+        } else if (estudianteId) {
+          userWithData = { ...user, estudianteId, curso };
+        }
         
         // Guardar en localStorage
         localStorage.setItem('authToken', token);
-        localStorage.setItem('user', JSON.stringify(userWithProfesorId));
+        localStorage.setItem('user', JSON.stringify(userWithData));
         
-        setUser(userWithProfesorId);
+        setUser(userWithData);
         return true;
       }
       
       return false;
-    } catch (error) {
-      console.error('Error en login:', error);
+    } catch {
       return false;
     }
   };
@@ -102,8 +104,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Llamar al endpoint de logout del backend
         await apiLogout();
       }
-    } catch (error) {
-      console.error('Error en logout:', error);
+    } catch {
+      // Error en logout, continuar con la limpieza
     } finally {
       // Limpiar localStorage
       localStorage.removeItem('authToken');

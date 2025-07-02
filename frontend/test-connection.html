@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Conexión</title>
+</head>
+<body>
+    <h1>Test de Conexión al Backend</h1>
+    <button onclick="testConnection()">Probar Conexión</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Probando conexión...';
+            
+            try {
+                // Probar endpoint de estudiantes
+                const response = await fetch('http://localhost:4000/api/estudiantes');
+                const data = await response.json();
+                
+                if (data.success && data.data.estudiantes) {
+                    resultDiv.innerHTML = `
+                        <h3>✅ Conexión exitosa!</h3>
+                        <p>Se encontraron ${data.data.estudiantes.length} estudiantes</p>
+                        <p>Primer estudiante: ${data.data.estudiantes[0].nombre} ${data.data.estudiantes[0].apellido}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3>⚠️ Respuesta inesperada</h3>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>❌ Error de conexión</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

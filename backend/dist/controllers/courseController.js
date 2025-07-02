@@ -17,7 +17,10 @@ const router = (0, express_1.Router)();
 router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const courses = yield (0, courseService_1.getAllCourses)();
-        res.json({ courses });
+        res.json({
+            success: true,
+            data: { courses }
+        });
     }
     catch (err) {
         next(err);
@@ -28,7 +31,10 @@ router.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     try {
         const id = Number(req.params.id);
         const course = yield (0, courseService_1.getCourseById)(id);
-        res.json({ course });
+        res.json({
+            success: true,
+            data: { course }
+        });
     }
     catch (err) {
         next(err);
@@ -42,7 +48,10 @@ router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             nombre,
             jefeId: Number(jefeId),
         });
-        res.status(201).json({ course: nuevoCurso });
+        res.status(201).json({
+            success: true,
+            data: { course: nuevoCurso }
+        });
     }
     catch (err) {
         next(err);
@@ -53,11 +62,14 @@ router.put("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     try {
         const id = Number(req.params.id);
         const { nombre, jefeId } = req.body;
-        const cursoActualizado = yield (0, courseService_1.updateCourse)(id, {
+        const courseActualizado = yield (0, courseService_1.updateCourse)(id, {
             nombre,
             jefeId: jefeId ? Number(jefeId) : undefined,
         });
-        res.json({ course: cursoActualizado });
+        res.json({
+            success: true,
+            data: { course: courseActualizado }
+        });
     }
     catch (err) {
         next(err);
@@ -74,25 +86,42 @@ router.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(err);
     }
 }));
-// POST /api/courses/:id/asignaturas - Agregar asignatura al curso
+// POST /api/courses/:id/asignaturas - Agregar asignatura a curso
 router.post("/:id/asignaturas", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cursoId = Number(req.params.id);
+        const courseId = Number(req.params.id);
         const { asignaturaId } = req.body;
-        yield (0, courseService_1.addAsignaturaToCourse)(cursoId, Number(asignaturaId));
-        res.status(201).json({ message: "Asignatura agregada al curso" });
+        yield (0, courseService_1.addAsignaturaToCourse)(courseId, asignaturaId);
+        res.status(201).json({
+            success: true,
+            data: { message: "Asignatura agregada al curso" }
+        });
     }
     catch (err) {
         next(err);
     }
 }));
-// DELETE /api/courses/:id/asignaturas/:asignaturaId - Remover asignatura del curso
+// DELETE /api/courses/:id/asignaturas/:asignaturaId - Remover asignatura de curso
 router.delete("/:id/asignaturas/:asignaturaId", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cursoId = Number(req.params.id);
+        const courseId = Number(req.params.id);
         const asignaturaId = Number(req.params.asignaturaId);
-        yield (0, courseService_1.removeAsignaturaFromCourse)(cursoId, asignaturaId);
+        yield (0, courseService_1.removeAsignaturaFromCourse)(courseId, asignaturaId);
         res.status(204).send();
+    }
+    catch (err) {
+        next(err);
+    }
+}));
+// GET /api/courses/profesor/:profesorId - Obtener cursos por profesor
+router.get("/profesor/:profesorId", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const profesorId = Number(req.params.profesorId);
+        const courses = yield (0, courseService_1.getCoursesByProfesor)(profesorId);
+        res.json({
+            success: true,
+            data: { courses }
+        });
     }
     catch (err) {
         next(err);

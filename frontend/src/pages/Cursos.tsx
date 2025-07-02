@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
-import { getCourses, getProfesores, getAsignaturas, createCourse, updateCourse, deleteCourse, getEstudiantesByCurso } from "../services/api";
-import type { Curso, Profesor, Asignatura, Student } from "../services/api";
+import { useEffect, useState, useRef } from "react";
+import { getCourses, getProfesores, createCourse, updateCourse, deleteCourse, getEstudiantesByCurso } from "../services/api";
+import type { Curso, Profesor, Student } from "../services/api";
 import "./Cursos.css";
 
 // Modal para crear/editar curso
@@ -73,8 +73,8 @@ function CursoModal({
 
       onCursoGuardado();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al crear curso");
     } finally {
       setLoading(false);
     }
@@ -491,13 +491,16 @@ export default function Cursos() {
     try {
       await deleteCourse(curso.id);
       cargarCursos();
-    } catch (err: any) {
-      alert(`Error al eliminar el curso: ${err.message}`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al eliminar curso");
     }
   };
 
   if (loading) return <p className="status-msg">Cargando cursos…</p>;
   if (error) return <p className="status-msg error">Error: {error}</p>;
+
+  // Seguridad: siempre usar un array
+  const cursosList = Array.isArray(cursos) ? cursos : [];
 
   return (
     <div className="courses-container">
@@ -524,7 +527,7 @@ export default function Cursos() {
       </div>
       
       <div className="courses-grid">
-        {cursos.map((curso) => (
+        {cursosList.map((curso) => (
           <div key={curso.id} className="course-card">
             <div className="card-header">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

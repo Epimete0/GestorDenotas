@@ -15,7 +15,10 @@ const router = Router();
 router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const asignaturas = await getAllAsignaturas();
-    res.json({ asignaturas });
+    res.json({ 
+      success: true,
+      data: { asignaturas } 
+    });
   } catch (err) {
     next(err);
   }
@@ -26,7 +29,10 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     const asignatura = await getAsignaturaById(id);
-    res.json({ asignatura });
+    res.json({ 
+      success: true,
+      data: { asignatura } 
+    });
   } catch (err) {
     next(err);
   }
@@ -37,7 +43,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { nombre } = req.body;
     const nuevaAsignatura = await createAsignatura({ nombre });
-    res.status(201).json({ asignatura: nuevaAsignatura });
+    res.status(201).json({ 
+      success: true,
+      data: { asignatura: nuevaAsignatura } 
+    });
   } catch (err) {
     next(err);
   }
@@ -49,7 +58,10 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
     const id = Number(req.params.id);
     const { nombre } = req.body;
     const asignaturaActualizada = await updateAsignatura(id, { nombre });
-    res.json({ asignatura: asignaturaActualizada });
+    res.json({ 
+      success: true,
+      data: { asignatura: asignaturaActualizada } 
+    });
   } catch (err) {
     next(err);
   }
@@ -66,19 +78,22 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
   }
 });
 
-// POST /api/asignaturas/:id/profesores - Agregar profesor a la asignatura
+// POST /api/asignaturas/:id/profesores - Agregar profesor a asignatura
 router.post("/:id/profesores", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const asignaturaId = Number(req.params.id);
     const { profesorId } = req.body;
-    await addProfesorToAsignatura(asignaturaId, Number(profesorId));
-    res.status(201).json({ message: "Profesor agregado a la asignatura" });
+    await addProfesorToAsignatura(asignaturaId, profesorId);
+    res.status(201).json({ 
+      success: true,
+      data: { message: "Profesor agregado a la asignatura" } 
+    });
   } catch (err) {
     next(err);
   }
 });
 
-// DELETE /api/asignaturas/:id/profesores/:profesorId - Remover profesor de la asignatura
+// DELETE /api/asignaturas/:id/profesores/:profesorId - Remover profesor de asignatura
 router.delete("/:id/profesores/:profesorId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const asignaturaId = Number(req.params.id);

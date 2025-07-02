@@ -1,55 +1,102 @@
 import { asignaturaRepository } from "../repositories/asignaturaRepository";
+import { createError } from "../config/errors";
 
 export async function getAllAsignaturas() {
-  return asignaturaRepository.findAll();
+  try {
+    return await asignaturaRepository.findAll();
+  } catch (error) {
+    throw createError.internal('Error al obtener asignaturas');
+  }
 }
 
 export async function getAsignaturaById(id: number) {
-  const asignatura = await asignaturaRepository.findById(id);
-  if (!asignatura) {
-    throw new Error("Asignatura no encontrada");
+  try {
+    const asignatura = await asignaturaRepository.findById(id);
+    if (!asignatura) {
+      throw createError.notFound('Asignatura no encontrada');
+    }
+    return asignatura;
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Asignatura no encontrada') {
+      throw error;
+    }
+    throw createError.internal('Error al obtener asignatura');
   }
-  return asignatura;
 }
 
 export async function createAsignatura(data: { nombre: string }) {
   // Validaciones básicas
   if (!data.nombre || data.nombre.trim().length === 0) {
-    throw new Error("El nombre de la asignatura es requerido");
+    throw createError.validation('El nombre de la asignatura es requerido');
   }
 
-  return asignaturaRepository.create(data);
+  try {
+    return await asignaturaRepository.create(data);
+  } catch (error) {
+    throw createError.internal('Error al crear asignatura');
+  }
 }
 
 export async function updateAsignatura(id: number, data: { nombre?: string }) {
-  // Verificar que la asignatura existe
-  await getAsignaturaById(id);
+  try {
+    // Verificar que la asignatura existe
+    await getAsignaturaById(id);
 
-  // Validaciones básicas
-  if (data.nombre && data.nombre.trim().length === 0) {
-    throw new Error("El nombre de la asignatura no puede estar vacío");
+    // Validaciones básicas
+    if (data.nombre && data.nombre.trim().length === 0) {
+      throw createError.validation('El nombre de la asignatura no puede estar vacío');
+    }
+
+    return await asignaturaRepository.update(id, data);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Asignatura no encontrada')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('El nombre de la asignatura')) {
+      throw error;
+    }
+    throw createError.internal('Error al actualizar asignatura');
   }
-
-  return asignaturaRepository.update(id, data);
 }
 
 export async function deleteAsignatura(id: number) {
-  // Verificar que la asignatura existe
-  await getAsignaturaById(id);
+  try {
+    // Verificar que la asignatura existe
+    await getAsignaturaById(id);
 
-  return asignaturaRepository.delete(id);
+    return await asignaturaRepository.delete(id);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Asignatura no encontrada')) {
+      throw error;
+    }
+    throw createError.internal('Error al eliminar asignatura');
+  }
 }
 
 export async function addProfesorToAsignatura(asignaturaId: number, profesorId: number) {
-  // Verificar que la asignatura existe
-  await getAsignaturaById(asignaturaId);
+  try {
+    // Verificar que la asignatura existe
+    await getAsignaturaById(asignaturaId);
 
-  return asignaturaRepository.addProfesor(asignaturaId, profesorId);
+    return await asignaturaRepository.addProfesor(asignaturaId, profesorId);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Asignatura no encontrada')) {
+      throw error;
+    }
+    throw createError.internal('Error al agregar profesor a asignatura');
+  }
 }
 
 export async function removeProfesorFromAsignatura(asignaturaId: number, profesorId: number) {
-  // Verificar que la asignatura existe
-  await getAsignaturaById(asignaturaId);
+  try {
+    // Verificar que la asignatura existe
+    await getAsignaturaById(asignaturaId);
 
-  return asignaturaRepository.removeProfesor(asignaturaId, profesorId);
+    return await asignaturaRepository.removeProfesor(asignaturaId, profesorId);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Asignatura no encontrada')) {
+      throw error;
+    }
+    throw createError.internal('Error al remover profesor de asignatura');
+  }
 } 

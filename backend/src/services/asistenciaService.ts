@@ -1,23 +1,43 @@
 import { asistenciaRepository } from "../repositories/asistenciaRepository";
+import { createError } from "../config/errors";
 
 export async function getAllAsistencias() {
-  return asistenciaRepository.findAll();
+  try {
+    return await asistenciaRepository.findAll();
+  } catch (error) {
+    throw createError.internal('Error al obtener asistencias');
+  }
 }
 
 export async function getAsistenciaById(id: number) {
-  const asistencia = await asistenciaRepository.findById(id);
-  if (!asistencia) {
-    throw new Error("Asistencia no encontrada");
+  try {
+    const asistencia = await asistenciaRepository.findById(id);
+    if (!asistencia) {
+      throw createError.notFound('Asistencia no encontrada');
+    }
+    return asistencia;
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Asistencia no encontrada') {
+      throw error;
+    }
+    throw createError.internal('Error al obtener asistencia');
   }
-  return asistencia;
 }
 
 export async function getAsistenciasByEstudiante(estudianteId: number) {
-  return asistenciaRepository.findByEstudiante(estudianteId);
+  try {
+    return await asistenciaRepository.findByEstudiante(estudianteId);
+  } catch (error) {
+    throw createError.internal('Error al obtener asistencias por estudiante');
+  }
 }
 
 export async function getAsistenciasByFecha(fecha: Date) {
-  return asistenciaRepository.findByFecha(fecha);
+  try {
+    return await asistenciaRepository.findByFecha(fecha);
+  } catch (error) {
+    throw createError.internal('Error al obtener asistencias por fecha');
+  }
 }
 
 export async function createAsistencia(data: {
@@ -27,25 +47,32 @@ export async function createAsistencia(data: {
 }) {
   // Validaciones básicas
   if (data.estudianteId <= 0) {
-    throw new Error("ID de estudiante inválido");
+    throw createError.validation('ID de estudiante inválido');
   }
   if (!["presente", "ausente", "tarde"].includes(data.estado)) {
-    throw new Error("Estado de asistencia inválido");
+    throw createError.validation('Estado de asistencia inválido');
   }
   if (data.fecha > new Date()) {
-    throw new Error("No se puede registrar asistencia para fechas futuras");
+    throw createError.validation('No se puede registrar asistencia para fechas futuras');
   }
 
-  // Verificar si ya existe asistencia para este estudiante en esta fecha
-  const existingAsistencia = await asistenciaRepository.findByEstudianteAndFecha(
-    data.estudianteId,
-    data.fecha
-  );
-  if (existingAsistencia) {
-    throw new Error("Ya existe un registro de asistencia para este estudiante en esta fecha");
-  }
+  try {
+    // Verificar si ya existe asistencia para este estudiante en esta fecha
+    const existingAsistencia = await asistenciaRepository.findByEstudianteAndFecha(
+      data.estudianteId,
+      data.fecha
+    );
+    if (existingAsistencia) {
+      throw createError.conflict('Ya existe un registro de asistencia para este estudiante en esta fecha');
+    }
 
-  return asistenciaRepository.create(data);
+    return await asistenciaRepository.create(data);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Ya existe un registro')) {
+      throw error;
+    }
+    throw createError.internal('Error al crear asistencia');
+  }
 }
 
 export async function updateAsistencia(
@@ -55,42 +82,66 @@ export async function updateAsistencia(
     estado?: "presente" | "ausente" | "tarde";
   }
 ) {
-  // Verificar que la asistencia existe
-  await getAsistenciaById(id);
+  try {
+    // Verificar que la asistencia existe
+    await getAsistenciaById(id);
 
-  // Validaciones básicas
-  if (data.estado && !["presente", "ausente", "tarde"].includes(data.estado)) {
-    throw new Error("Estado de asistencia inválido");
-  }
-  if (data.fecha && data.fecha > new Date()) {
-    throw new Error("No se puede registrar asistencia para fechas futuras");
-  }
+    // Validaciones básicas
+    if (data.estado && !["presente", "ausente", "tarde"].includes(data.estado)) {
+      throw createError.validation('Estado de asistencia inválido');
+    }
+    if (data.fecha && data.fecha > new Date()) {
+      throw createError.validation('No se puede registrar asistencia para fechas futuras');
+    }
 
-  return asistenciaRepository.update(id, data);
+    return await asistenciaRepository.update(id, data);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Asistencia no encontrada')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('Estado de asistencia inválido')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('No se puede registrar asistencia')) {
+      throw error;
+    }
+    throw createError.internal('Error al actualizar asistencia');
+  }
 }
 
 export async function deleteAsistencia(id: number) {
-  // Verificar que la asistencia existe
-  await getAsistenciaById(id);
+  try {
+    // Verificar que la asistencia existe
+    await getAsistenciaById(id);
 
-  return asistenciaRepository.delete(id);
+    return await asistenciaRepository.delete(id);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Asistencia no encontrada')) {
+      throw error;
+    }
+    throw createError.internal('Error al eliminar asistencia');
+  }
 }
 
 export async function getEstadisticasAsistencia() {
-  const asistencias = await asistenciaRepository.findAll();
-  
-  const total = asistencias.length;
-  const presentes = asistencias.filter((a: any) => a.estado === "presente").length;
-  const ausentes = asistencias.filter((a: any) => a.estado === "ausente").length;
-  const tardes = asistencias.filter((a: any) => a.estado === "tarde").length;
+  try {
+    const asistencias = await asistenciaRepository.findAll();
+    
+    const total = asistencias.length;
+    const presentes = asistencias.filter((a: any) => a.estado === "presente").length;
+    const ausentes = asistencias.filter((a: any) => a.estado === "ausente").length;
+    const tardes = asistencias.filter((a: any) => a.estado === "tarde").length;
 
-  return {
-    total,
-    presentes,
-    ausentes,
-    tardes,
-    porcentajePresentes: total > 0 ? (presentes / total) * 100 : 0,
-    porcentajeAusentes: total > 0 ? (ausentes / total) * 100 : 0,
-    porcentajeTardes: total > 0 ? (tardes / total) * 100 : 0,
-  };
+    return {
+      total,
+      presentes,
+      ausentes,
+      tardes,
+      porcentajePresentes: total > 0 ? (presentes / total) * 100 : 0,
+      porcentajeAusentes: total > 0 ? (ausentes / total) * 100 : 0,
+      porcentajeTardes: total > 0 ? (tardes / total) * 100 : 0,
+    };
+  } catch (error) {
+    throw createError.internal('Error al obtener estadísticas de asistencia');
+  }
 } 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getProfesores, createProfesor, updateProfesor, deleteProfesor } from "../services/api";
 import type { Profesor } from "../services/api";
 import "./Estudiantes.css";
@@ -59,8 +59,8 @@ function CrearProfesorModal({ onClose, onProfesorCreado }: { onClose: () => void
       });
       onProfesorCreado();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al crear profesor");
     } finally {
       setLoading(false);
     }
@@ -169,8 +169,8 @@ function EditarProfesorModal({ profesor, onClose, onProfesorEditado }: { profeso
       });
       onProfesorEditado();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al actualizar profesor");
     } finally {
       setLoading(false);
     }
@@ -267,27 +267,34 @@ export default function Profesores() {
   const [mostrarCrearModal, setMostrarCrearModal] = useState(false);
   const [profesorAEditar, setProfesorAEditar] = useState<Profesor | null>(null);
   const [profesorAEliminar, setProfesorAEliminar] = useState<Profesor | null>(null);
-  const [eliminando, setEliminando] = useState(false);
 
   const cargarProfesores = () => {
+    console.log('🔄 Iniciando carga de profesores...');
     setCargando(true);
     getProfesores()
-      .then(setLista)
-      .catch((e) => setErr(e.message))
-      .finally(() => setCargando(false));
+      .then((data) => {
+        console.log('✅ Datos de profesores recibidos:', data);
+        setLista(data);
+        console.log('✅ Lista de profesores actualizada con', data.length, 'profesores');
+      })
+      .catch((e) => {
+        console.error('❌ Error al cargar profesores:', e);
+        setErr(e.message);
+      })
+      .finally(() => {
+        console.log('🏁 Finalizando carga de profesores');
+        setCargando(false);
+      });
   };
 
   const handleEliminarProfesor = async () => {
     if (!profesorAEliminar) return;
-    setEliminando(true);
     try {
       await deleteProfesor(profesorAEliminar.id);
       cargarProfesores();
       setProfesorAEliminar(null);
-    } catch (err: any) {
-      alert("Error al eliminar profesor: " + err.message);
-    } finally {
-      setEliminando(false);
+    } catch (err: unknown) {
+      setErr(err instanceof Error ? err.message : "Error al eliminar profesor");
     }
   };
 
@@ -297,6 +304,8 @@ export default function Profesores() {
 
   if (cargando) return <p className="status">Cargando profesores…</p>;
   if (err) return <p className="status error">Error: {err}</p>;
+
+  const listaSegura = Array.isArray(lista) ? lista : [];
 
   return (
     <div className="estudiantes-container">
@@ -322,68 +331,72 @@ export default function Profesores() {
         </button>
       </div>
       <div className="estudiantes-grid">
-        {lista.map((p) => (
-          <div
-            key={p.id}
-            className="estudiante-card"
-            style={{ cursor: "pointer", position: "relative" }}
-          >
-            <div className="card-header">
-              {p.nombre} {p.apellido}
-            </div>
-            <div className="card-body">
-              <p>
-                <strong>Edad:</strong> {p.edad} · <strong>Sexo:</strong> {p.sexo}
-              </p>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                <button
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    setProfesorAEditar(p);
-                  }}
-                  style={{
-                    padding: '0.5rem',
-                    border: 'none',
-                    borderRadius: 6,
-                    background: 'var(--accent-secondary)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minWidth: '40px'
-                  }}
-                  title="Editar profesor"
-                >
-                  ✎
-                </button>
-                <button
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    setProfesorAEliminar(p);
-                  }}
-                  style={{
-                    padding: '0.5rem',
-                    border: 'none',
-                    borderRadius: 6,
-                    background: 'var(--accent-secondary)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minWidth: '40px'
-                  }}
-                  title="Eliminar profesor"
-                >
-                  🗑
-                </button>
+        {listaSegura.length === 0 ? (
+          <p style={{ color: '#888', textAlign: 'center', width: '100%' }}>No hay profesores registrados.</p>
+        ) : (
+          listaSegura.map((p) => (
+            <div
+              key={p.id}
+              className="estudiante-card"
+              style={{ cursor: "pointer", position: "relative" }}
+            >
+              <div className="card-header">
+                {p.nombre} {p.apellido}
+              </div>
+              <div className="card-body">
+                <p>
+                  <strong>Edad:</strong> {p.edad} · <strong>Sexo:</strong> {p.sexo}
+                </p>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      setProfesorAEditar(p);
+                    }}
+                    style={{
+                      padding: '0.5rem',
+                      border: 'none',
+                      borderRadius: 6,
+                      background: 'var(--accent-secondary)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '40px'
+                    }}
+                    title="Editar profesor"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      setProfesorAEliminar(p);
+                    }}
+                    style={{
+                      padding: '0.5rem',
+                      border: 'none',
+                      borderRadius: 6,
+                      background: 'var(--accent-secondary)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '40px'
+                    }}
+                    title="Eliminar profesor"
+                  >
+                    🗑
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       {mostrarCrearModal && (
         <CrearProfesorModal onClose={() => setMostrarCrearModal(false)} onProfesorCreado={cargarProfesores} />

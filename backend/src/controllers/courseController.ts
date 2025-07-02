@@ -9,6 +9,7 @@ import {
   addAsignaturaToCourse,
   removeAsignaturaFromCourse,
   getCoursesByProfesor,
+  getCoursesByEstudiante,
 } from "../services/courseService";
 
 const router = Router();
@@ -17,7 +18,10 @@ const router = Router();
 router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const courses = await getAllCourses();
-    res.json({ courses });
+    res.json({ 
+      success: true,
+      data: { courses } 
+    });
   } catch (err) {
     next(err);
   }
@@ -28,7 +32,10 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     const course = await getCourseById(id);
-    res.json({ course });
+    res.json({ 
+      success: true,
+      data: { course } 
+    });
   } catch (err) {
     next(err);
   }
@@ -42,7 +49,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       nombre,
       jefeId: Number(jefeId),
     });
-    res.status(201).json({ course: nuevoCurso });
+    res.status(201).json({ 
+      success: true,
+      data: { course: nuevoCurso } 
+    });
   } catch (err) {
     next(err);
   }
@@ -53,11 +63,14 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     const { nombre, jefeId } = req.body;
-    const cursoActualizado = await updateCourse(id, {
+    const courseActualizado = await updateCourse(id, {
       nombre,
       jefeId: jefeId ? Number(jefeId) : undefined,
     });
-    res.json({ course: cursoActualizado });
+    res.json({ 
+      success: true,
+      data: { course: courseActualizado } 
+    });
   } catch (err) {
     next(err);
   }
@@ -74,36 +87,56 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
   }
 });
 
-// POST /api/courses/:id/asignaturas - Agregar asignatura al curso
+// POST /api/courses/:id/asignaturas - Agregar asignatura a curso
 router.post("/:id/asignaturas", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const cursoId = Number(req.params.id);
+    const courseId = Number(req.params.id);
     const { asignaturaId } = req.body;
-    await addAsignaturaToCourse(cursoId, Number(asignaturaId));
-    res.status(201).json({ message: "Asignatura agregada al curso" });
+    await addAsignaturaToCourse(courseId, asignaturaId);
+    res.status(201).json({ 
+      success: true,
+      data: { message: "Asignatura agregada al curso" } 
+    });
   } catch (err) {
     next(err);
   }
 });
 
-// DELETE /api/courses/:id/asignaturas/:asignaturaId - Remover asignatura del curso
+// DELETE /api/courses/:id/asignaturas/:asignaturaId - Remover asignatura de curso
 router.delete("/:id/asignaturas/:asignaturaId", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const cursoId = Number(req.params.id);
+    const courseId = Number(req.params.id);
     const asignaturaId = Number(req.params.asignaturaId);
-    await removeAsignaturaFromCourse(cursoId, asignaturaId);
+    await removeAsignaturaFromCourse(courseId, asignaturaId);
     res.status(204).send();
   } catch (err) {
     next(err);
   }
 });
 
-// GET /api/courses/profesor/:profesorId - Obtener cursos donde el profesor es jefe
+// GET /api/courses/profesor/:profesorId - Obtener cursos por profesor
 router.get("/profesor/:profesorId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const profesorId = Number(req.params.profesorId);
-    const cursos = await getCoursesByProfesor(profesorId);
-    res.json({ cursos });
+    const courses = await getCoursesByProfesor(profesorId);
+    res.json({ 
+      success: true,
+      data: { courses } 
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/courses/estudiante/:estudianteId - Obtener cursos por estudiante
+router.get("/estudiante/:estudianteId", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const estudianteId = Number(req.params.estudianteId);
+    const courses = await getCoursesByEstudiante(estudianteId);
+    res.json({ 
+      success: true,
+      data: { courses } 
+    });
   } catch (err) {
     next(err);
   }

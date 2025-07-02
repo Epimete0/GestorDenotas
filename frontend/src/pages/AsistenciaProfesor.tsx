@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './AsistenciaProfesor.module.css';
 import { getCursosByProfesor, getEstudiantesByCurso, createAsistencia } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
